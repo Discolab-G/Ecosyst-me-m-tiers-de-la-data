@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Écosystème des Métiers de la Data — Discolab-G</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-page-bg:       #f4fafb;
+    --color-primary:       #112c53;
+    --color-acquired:      #112c53;
+    --color-not-acquired:  #ac0035;
+    --color-text-main:     #112c53;
+    --color-text-muted:    #836822;
+    --color-text-alt:      #67707e;
+    --color-circle-bg:     #bcd1f2;
+    --color-panel-bg:      #bcd1f2;
+    --color-panel-text:    #836822;
+    --color-hover:         rgba(17,44,83,0.07);
+    --color-focus:         rgba(17,44,83,0.22);
+    --c1: #112c53;
+    --c2: #ac0035;
+    --c3: #836822;
+    --c4: #1a6b4a;
+    --panel-width: 440px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { overflow-x: hidden; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--color-page-bg);
+    color: var(--color-text-main);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px; height: 68px;
+    background: var(--color-primary);
+    border-bottom: 3px solid var(--color-not-acquired);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo-mark {
+    width: 38px; height: 38px; border-radius: 8px;
+    background: var(--color-not-acquired);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px; color: #fff; flex-shrink: 0;
+  }
+  .logo-name { font-size: 17px; font-weight: 700; color: #f4fafb; }
+  .logo-name span { color: #bcd1f2; }
+  header h1 {
+    font-size: 12px; font-weight: 600; color: rgba(244,250,251,0.65);
+    letter-spacing: 0.09em; text-transform: uppercase;
+    position: absolute; left: 50%; transform: translateX(-50%);
+  }
+  .header-badge {
+    background: rgba(188,209,242,0.15); border: 1px solid rgba(188,209,242,0.30);
+    color: #bcd1f2; padding: 4px 14px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+  }
+
+  /* PAGE FOOTER */
+  .page-footer {
+    background: var(--color-primary);
+    border-top: 3px solid var(--color-not-acquired);
+    padding: 14px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px;
+  }
+  .footer-left { display: flex; align-items: center; gap: 10px; }
+  .footer-claude-mark {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: var(--color-not-acquired);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+  .footer-credit { font-size: 11.5px; color: rgba(188,209,242,0.80); font-weight: 500; line-height: 1.4; }
+  .footer-credit strong { color: #f4fafb; font-weight: 700; }
+  .footer-credit a {
+    color: #bcd1f2; text-decoration: none; border-bottom: 1px solid rgba(188,209,242,0.35);
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .footer-credit a:hover { color: #f4fafb; border-color: #f4fafb; }
+  .footer-right { font-size: 10px; color: rgba(188,209,242,0.45); letter-spacing: 0.05em; text-align: right; }
+
+  /* LAYOUT */
+  .main { display: flex; min-height: calc(100vh - 68px); }
+  .map-area {
+    flex: 1; padding: 28px 32px;
+    transition: margin-right 0.35s cubic-bezier(0.4,0,0.2,1);
+    overflow-y: auto;
+  }
+  .map-area.panel-open { margin-right: var(--panel-width); }
+
+  /* LEGEND */
+  .legend {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 24px; padding: 11px 16px;
+    background: #fff; border: 1px solid rgba(17,44,83,0.11); border-radius: 10px;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12px; font-weight: 500; color: var(--color-text-alt);
+    padding: 3px 10px; border-radius: 20px;
+    background: var(--color-page-bg); border: 1px solid rgba(17,44,83,0.08);
+  }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .legend-note { margin-left: auto; font-size: 11px; font-style: italic; color: var(--color-text-alt); }
+
+  /* ROOT */
+  .root-node { display: flex; justify-content: center; margin-bottom: 24px; }
+  .root-pill {
+    background: var(--color-primary); border-radius: 40px;
+    padding: 14px 44px; text-align: center;
+    box-shadow: 0 4px 18px rgba(17,44,83,0.18);
+    border: 2px solid var(--color-not-acquired);
+  }
+  .root-pill h2 { font-size: 17px; font-weight: 800; color: #f4fafb; }
+  .root-pill p { font-size: 11px; color: rgba(244,250,251,0.5); margin-top: 3px; }
+
+  /* BRANCHES GRID */
+  .branches-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+  /* BRANCH */
+  .branch {
+    background: #fff; border-radius: 13px;
+    border: 1px solid rgba(17,44,83,0.10);
+    overflow: hidden; box-shadow: 0 2px 8px rgba(17,44,83,0.05);
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .branch:hover { box-shadow: 0 4px 18px rgba(17,44,83,0.10); border-color: rgba(17,44,83,0.17); }
+  .branch-header {
+    padding: 15px 18px; display: flex; align-items: center; gap: 11px;
+    border-bottom: 1px solid rgba(17,44,83,0.08);
+  }
+  .branch-icon {
+    width: 34px; height: 34px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0; background: var(--color-panel-bg);
+  }
+  .branch-title { font-size: 12px; font-weight: 750; text-transform: uppercase; letter-spacing: 0.07em; }
+  .branch-count {
+    margin-left: auto; font-size: 11px; color: var(--color-text-alt);
+    background: var(--color-page-bg); padding: 2px 9px; border-radius: 20px;
+    border: 1px solid rgba(17,44,83,0.08);
+  }
+  .branch-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+
+  /* SUB-BRANCH */
+  .sub-branch {
+    background: var(--color-page-bg); border-radius: 9px;
+    border: 1px solid rgba(17,44,83,0.09); overflow: hidden;
+  }
+  .sub-branch-title {
+    padding: 7px 12px; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.09em; text-transform: uppercase; color: var(--color-text-alt);
+    border-bottom: 1px solid rgba(17,44,83,0.08);
+    display: flex; align-items: center; gap: 7px;
+    background: rgba(188,209,242,0.20);
+  }
+  .sub-accent { width: 3px; height: 11px; border-radius: 2px; flex-shrink: 0; }
+  .sub-items { padding: 6px; display: flex; flex-direction: column; gap: 3px; }
+
+  /* METIER */
+  .metier {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 11px; border-radius: 7px; cursor: pointer;
+    border: 1px solid transparent; transition: all 0.15s ease;
+  }
+  .metier:hover { background: var(--color-hover); border-color: rgba(17,44,83,0.10); }
+  .metier.active { background: rgba(17,44,83,0.06); border-color: var(--node-color, var(--color-primary)); }
+  .metier-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--node-color, var(--color-primary)); flex-shrink: 0; }
+  .metier-name { font-size: 13px; font-weight: 500; flex: 1; color: var(--color-text-main); }
+  .metier:hover .metier-name, .metier.active .metier-name { font-weight: 600; }
+  .metier-arrow { font-size: 10px; color: var(--color-text-alt); opacity: 0; transition: opacity 0.15s; }
+  .metier:hover .metier-arrow, .metier.active .metier-arrow { opacity: 1; }
+  .new-tag {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.05em;
+    background: rgba(172,0,53,0.10); color: var(--color-not-acquired);
+    border: 1px solid rgba(172,0,53,0.25); padding: 1px 6px; border-radius: 4px; flex-shrink: 0;
+  }
+  .trend-tag {
+    font-size: 9px; font-weight: 700;
+    background: rgba(26,107,74,0.10); color: #1a6b4a;
+    border: 1px solid rgba(26,107,74,0.22); padding: 1px 6px; border-radius: 4px; flex-shrink: 0;
+  }
+
+  /* SIDE PANEL */
+  .side-panel {
+    position: fixed; top: 68px; right: 0;
+    width: var(--panel-width); height: calc(100vh - 68px);
+    background: #fff; border-left: 2px solid rgba(17,44,83,0.11);
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    z-index: 200; overflow-y: auto;
+    display: flex; flex-direction: column;
+    box-shadow: -4px 0 22px rgba(17,44,83,0.08);
+  }
+  .side-panel.open { transform: translateX(0); }
+
+  .panel-top {
+    padding: 24px 22px 18px; border-bottom: 1px solid rgba(17,44,83,0.10);
+    background: var(--color-primary); position: relative;
+  }
+  .panel-branch-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase; margin-bottom: 8px; color: rgba(188,209,242,0.75);
+  }
+  .panel-title { font-size: 19px; font-weight: 800; line-height: 1.2; margin-bottom: 12px; color: #f4fafb; }
+  .panel-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .panel-tag {
+    font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600;
+    background: rgba(188,209,242,0.14); border: 1px solid rgba(188,209,242,0.26); color: #bcd1f2;
+  }
+  .panel-tag.tag-new { background: rgba(172,0,53,0.22); border-color: rgba(172,0,53,0.42); color: #ff7096; }
+  .panel-close-top {
+    position: absolute; top: 14px; right: 14px;
+    width: 30px; height: 30px; border-radius: 7px;
+    background: rgba(244,250,251,0.10); border: 1px solid rgba(244,250,251,0.18);
+    color: rgba(244,250,251,0.75); cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+  }
+  .panel-close-top:hover { background: rgba(244,250,251,0.20); color: #fff; }
+
+  .panel-body { padding: 20px 22px; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+
+  .panel-section h4 {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+    color: var(--color-text-muted); margin-bottom: 9px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel-section h4::after { content: ''; flex: 1; height: 1px; background: rgba(17,44,83,0.10); }
+
+  .panel-desc {
+    font-size: 13px; line-height: 1.65; color: var(--color-text-main);
+    background: var(--color-page-bg); padding: 12px 13px; border-radius: 8px;
+    border: 1px solid rgba(17,44,83,0.08);
+  }
+  .skills-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .skill-chip {
+    font-size: 11.5px; padding: 4px 11px; border-radius: 6px;
+    background: var(--color-panel-bg); border: 1px solid rgba(17,44,83,0.12);
+    color: var(--color-primary); font-weight: 500;
+    cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .skill-chip:hover {
+    background: var(--color-primary); color: #f4fafb;
+    border-color: var(--color-primary);
+  }
+  .skill-chip .skill-icon {
+    font-size: 10px; opacity: 0.6; flex-shrink: 0;
+  }
+  .skill-chip:hover .skill-icon { opacity: 1; }
+
+  /* Skill tooltip overlay */
+  .skill-overlay {
+    position: fixed; inset: 0;
+    background: rgba(17,44,83,0.45);
+    z-index: 500;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .skill-overlay.visible {
+    opacity: 1; pointer-events: all;
+  }
+  .skill-tooltip {
+    background: #fff; border-radius: 14px;
+    max-width: 480px; width: 100%;
+    box-shadow: 0 20px 60px rgba(17,44,83,0.25);
+    border: 1px solid rgba(17,44,83,0.12);
+    overflow: hidden;
+    transform: translateY(8px);
+    transition: transform 0.2s;
+  }
+  .skill-overlay.visible .skill-tooltip { transform: translateY(0); }
+
+  .skill-tooltip-header {
+    background: var(--color-primary);
+    padding: 16px 20px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  }
+  .skill-tooltip-title {
+    font-size: 15px; font-weight: 700; color: #f4fafb; line-height: 1.3;
+  }
+  .skill-tooltip-close {
+    width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0;
+    background: rgba(244,250,251,0.12); border: 1px solid rgba(244,250,251,0.18);
+    color: rgba(244,250,251,0.8); cursor: pointer; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .skill-tooltip-close:hover { background: rgba(244,250,251,0.22); color: #fff; }
+
+  .skill-tooltip-body {
+    padding: 18px 20px;
+    min-height: 80px;
+  }
+  .skill-tooltip-text {
+    font-size: 13.5px; line-height: 1.7; color: var(--color-text-main);
+  }
+  .skill-tooltip-loading {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--color-text-alt); font-size: 13px; font-style: italic;
+  }
+  .skill-spinner {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--color-panel-bg);
+    border-top-color: var(--color-primary);
+    animation: spin 0.7s linear infinite; flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .skill-tooltip-error {
+    font-size: 13px; color: var(--color-not-acquired); font-style: italic;
+    padding: 4px 0;
+  }
+  .skill-tooltip-footer {
+    padding: 8px 20px 14px;
+    font-size: 10px; color: var(--color-text-alt); font-style: italic;
+    border-top: 1px solid rgba(17,44,83,0.07);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .skill-tooltip-footer::before {
+    content: '✦'; font-size: 9px; color: var(--color-not-acquired);
+  }
+  .tools-list { display: flex; flex-direction: column; gap: 5px; }
+  .tool-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 11px; background: var(--color-page-bg); border-radius: 7px;
+    font-size: 12.5px; border: 1px solid rgba(17,44,83,0.08); color: var(--color-text-main);
+  }
+  .tool-icon { font-size: 14px; }
+
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .info-card {
+    background: var(--color-page-bg); border-radius: 8px; padding: 12px;
+    border: 1px solid rgba(17,44,83,0.09);
+  }
+  .info-card .label { font-size: 10px; color: var(--color-text-alt); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; font-weight: 600; }
+  .info-card .value { font-size: 13px; font-weight: 700; color: var(--color-primary); }
+  .info-card .value.accent { color: var(--color-not-acquired); }
+
+  /* Career path card */
+  .info-card.career-card {
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .info-card.career-card:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+  .info-card.career-card:hover .label { color: rgba(188,209,242,0.7); }
+  .info-card.career-card:hover .value { color: #f4fafb; }
+  .career-hint {
+    font-size: 9px; color: var(--color-not-acquired); font-weight: 600;
+    letter-spacing: 0.04em; margin-top: 5px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .info-card.career-card:hover .career-hint { color: #bcd1f2; }
+
+  /* Career path overlay */
+  .career-overlay {
+    position: fixed; inset: 0;
+    background: rgba(17,44,83,0.45);
+    z-index: 500;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .career-overlay.visible { opacity: 1; pointer-events: all; }
+
+  .career-modal {
+    background: #fff; border-radius: 14px;
+    max-width: 520px; width: 100%;
+    box-shadow: 0 20px 60px rgba(17,44,83,0.25);
+    border: 1px solid rgba(17,44,83,0.12);
+    overflow: hidden;
+    transform: translateY(8px);
+    transition: transform 0.2s;
+  }
+  .career-overlay.visible .career-modal { transform: translateY(0); }
+
+  .career-modal-header {
+    background: var(--color-primary); padding: 16px 20px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  }
+  .career-modal-pretitle {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase; color: rgba(188,209,242,0.7); margin-bottom: 4px;
+  }
+  .career-modal-title {
+    font-size: 15px; font-weight: 700; color: #f4fafb; line-height: 1.3;
+  }
+  .career-modal-close {
+    width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0;
+    background: rgba(244,250,251,0.12); border: 1px solid rgba(244,250,251,0.18);
+    color: rgba(244,250,251,0.8); cursor: pointer; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+  }
+  .career-modal-close:hover { background: rgba(244,250,251,0.22); color: #fff; }
+
+  .career-modal-body { padding: 18px 20px; min-height: 80px; }
+  .career-modal-text {
+    font-size: 13.5px; line-height: 1.75; color: var(--color-text-main);
+  }
+  .career-modal-text p + p { margin-top: 10px; }
+
+  .career-loading {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--color-text-alt); font-size: 13px; font-style: italic;
+  }
+  .career-spinner {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--color-panel-bg);
+    border-top-color: var(--color-primary);
+    animation: spin 0.7s linear infinite; flex-shrink: 0;
+  }
+  .career-modal-footer {
+    padding: 8px 20px 14px;
+    font-size: 10px; color: var(--color-text-alt); font-style: italic;
+    border-top: 1px solid rgba(17,44,83,0.07);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .career-modal-footer::before { content: '✦'; font-size: 9px; color: var(--color-not-acquired); }
+
+  .salary-block {
+    background: var(--color-primary); border-radius: 10px; padding: 14px 16px;
+  }
+  .salary-label { font-size: 10px; color: rgba(188,209,242,0.65); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 600; }
+  .salary-val { font-size: 21px; font-weight: 800; color: #bcd1f2; }
+  .salary-note { font-size: 11px; color: rgba(188,209,242,0.50); margin-top: 3px; }
+
+  .trend-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-alt); margin-bottom: 7px; font-weight: 500; }
+  .trend-val { font-weight: 700; color: var(--color-primary); }
+  .trend-bar { height: 7px; border-radius: 4px; background: var(--color-panel-bg); overflow: hidden; }
+  .trend-fill { height: 100%; border-radius: 4px; background: linear-gradient(to right, var(--color-primary), var(--color-not-acquired)); transition: width 0.7s ease 0.12s; width: 0%; }
+
+  .market-note {
+    font-size: 12px; color: var(--color-text-alt); font-style: italic; line-height: 1.5; margin-top: 8px;
+    padding: 9px 12px; background: var(--color-page-bg); border-radius: 7px;
+    border-left: 3px solid var(--color-not-acquired);
+  }
+  .source-note { font-size: 10px; color: var(--color-text-alt); font-style: italic; text-align: right; margin-top: 4px; }
+
+  /* Sources button */
+  .sources-btn {
+    display: flex; align-items: center; gap: 7px;
+    width: 100%; margin-top: 6px;
+    padding: 9px 14px; border-radius: 8px;
+    background: var(--color-page-bg);
+    border: 1px solid rgba(17,44,83,0.12);
+    color: var(--color-primary); cursor: pointer;
+    font-size: 12px; font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s; text-align: left;
+  }
+  .sources-btn:hover {
+    background: var(--color-primary); color: #f4fafb;
+    border-color: var(--color-primary);
+  }
+  .sources-btn-icon { font-size: 13px; flex-shrink: 0; }
+  .sources-btn-text { flex: 1; }
+  .sources-btn-arrow { font-size: 10px; opacity: 0.5; }
+  .sources-btn:hover .sources-btn-arrow { opacity: 1; }
+
+  /* Sources overlay */
+  .sources-overlay {
+    position: fixed; inset: 0;
+    background: rgba(17,44,83,0.45);
+    z-index: 500;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .sources-overlay.visible { opacity: 1; pointer-events: all; }
+
+  .sources-modal {
+    background: #fff; border-radius: 14px;
+    max-width: 560px; width: 100%;
+    max-height: 82vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(17,44,83,0.25);
+    border: 1px solid rgba(17,44,83,0.12);
+    overflow: hidden;
+    transform: translateY(8px); transition: transform 0.2s;
+    display: flex; flex-direction: column;
+  }
+  .sources-overlay.visible .sources-modal { transform: translateY(0); }
+
+  .sources-modal-header {
+    background: var(--color-primary); padding: 16px 20px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    flex-shrink: 0;
+  }
+  .sources-modal-pretitle {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase; color: rgba(188,209,242,0.7); margin-bottom: 3px;
+  }
+  .sources-modal-title {
+    font-size: 15px; font-weight: 700; color: #f4fafb; line-height: 1.3;
+  }
+  .sources-modal-close {
+    width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0;
+    background: rgba(244,250,251,0.12); border: 1px solid rgba(244,250,251,0.18);
+    color: rgba(244,250,251,0.8); cursor: pointer; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+  }
+  .sources-modal-close:hover { background: rgba(244,250,251,0.22); color: #fff; }
+
+  .sources-modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+  .source-card {
+    border: 1px solid rgba(17,44,83,0.10); border-radius: 10px; overflow: hidden;
+  }
+  .source-card-header {
+    padding: 11px 14px; display: flex; align-items: center; gap: 10px;
+    background: var(--color-page-bg); border-bottom: 1px solid rgba(17,44,83,0.08);
+  }
+  .source-badge {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 4px; flex-shrink: 0;
+  }
+  .source-badge.official   { background: rgba(26,107,74,0.12); color: #1a6b4a; border: 1px solid rgba(26,107,74,0.25); }
+  .source-badge.pro        { background: rgba(17,44,83,0.10); color: #112c53; border: 1px solid rgba(17,44,83,0.22); }
+  .source-badge.regulation { background: rgba(172,0,53,0.10); color: #ac0035; border: 1px solid rgba(172,0,53,0.25); }
+  .source-badge.research   { background: rgba(131,104,34,0.12); color: #836822; border: 1px solid rgba(131,104,34,0.25); }
+
+  .source-name { font-size: 13px; font-weight: 700; color: var(--color-primary); flex: 1; }
+  .source-date { font-size: 10px; color: var(--color-text-alt); font-style: italic; flex-shrink: 0; }
+
+  .source-card-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 7px; }
+  .source-desc { font-size: 12px; color: var(--color-text-alt); line-height: 1.5; }
+  .source-coverage {
+    font-size: 11px; color: var(--color-text-main);
+    background: rgba(188,209,242,0.20); padding: 5px 10px; border-radius: 5px;
+  }
+  .source-coverage strong { color: var(--color-primary); font-weight: 600; }
+
+  .source-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11.5px; font-weight: 600; color: var(--color-primary);
+    text-decoration: none; padding: 5px 10px; border-radius: 6px;
+    background: var(--color-panel-bg); border: 1px solid rgba(17,44,83,0.12);
+    transition: all 0.15s; align-self: flex-start;
+  }
+  .source-link:hover { background: var(--color-primary); color: #f4fafb; border-color: var(--color-primary); }
+  .source-link-icon { font-size: 10px; }
+
+  .sources-modal-footer {
+    padding: 10px 20px 14px; flex-shrink: 0;
+    font-size: 10px; color: var(--color-text-alt); font-style: italic;
+    border-top: 1px solid rgba(17,44,83,0.07);
+    display: flex; align-items: center; gap: 6px; background: #fff;
+  }
+  .sources-modal-footer::before { content: '✦'; font-size: 9px; color: var(--color-not-acquired); }
+
+  .sources-disclaimer {
+    padding: 10px 14px; margin: 0 0 4px;
+    background: rgba(172,0,53,0.05); border: 1px solid rgba(172,0,53,0.15);
+    border-radius: 8px; font-size: 11.5px; color: var(--color-text-main); line-height: 1.55;
+  }
+  .sources-disclaimer strong { color: var(--color-not-acquired); }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(17,44,83,0.16); border-radius: 2px; }
+
+  @media (max-width: 860px) {
+    .branches-grid { grid-template-columns: 1fr; }
+    .map-area.panel-open { margin-right: 0; }
+    .side-panel { width: 100%; }
+    header h1 { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="logo-mark">DG</div>
+    <div class="logo-name"><span>Disco</span>lab-G</div>
+  </div>
+  <h1>Écosystème des Métiers de la Data</h1>
+  <div class="header-badge">Édition 2026</div>
+</header>
+
+<div class="main">
+  <div class="map-area" id="mapArea">
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--c1)"></div>Direction & Stratégie</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--c2)"></div>Gouvernance & Qualité</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--c3)"></div>Ingénierie & Infrastructure</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--c4)"></div>Analyse & Science des Données</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--color-not-acquired)"></div><span style="color:var(--color-not-acquired);font-weight:600">Nouveau 2025-2026</span></div>
+      <span class="legend-note">Cliquez sur un métier pour afficher sa fiche</span>
+    </div>
+
+    <div class="root-node">
+      <div class="root-pill">
+        <h2>Écosystème des Métiers de la Data</h2>
+        <p>33 rôles · Données vérifiées Factoriel & Licorne Society · Mars 2026</p>
+      </div>
+    </div>
+
+    <div class="branches-grid">
+
+      <!-- 1 DIRECTION -->
+      <div class="branch">
+        <div class="branch-header">
+          <div class="branch-icon">🎯</div>
+          <div class="branch-title" style="color:var(--c1)">Direction & Stratégie</div>
+          <div class="branch-count">6 rôles</div>
+        </div>
+        <div class="branch-body">
+          <div class="metier" style="--node-color:var(--c1)" onclick="showPanel('cdo')"><div class="metier-dot"></div><div class="metier-name">Chief Data Officer (CDO)</div><div class="metier-arrow">→</div></div>
+          <div class="metier" style="--node-color:var(--c1)" onclick="showPanel('cao')"><div class="metier-dot"></div><div class="metier-name">Chief Analytics Officer (CAO)</div><div class="metier-arrow">→</div></div>
+          <div class="metier" style="--node-color:var(--c1)" onclick="showPanel('caio')"><div class="metier-dot"></div><div class="metier-name">Chief AI Officer (CAIO)</div><span class="new-tag">NEW</span><div class="metier-arrow">→</div></div>
+          <div class="metier" style="--node-color:var(--c1)" onclick="showPanel('data-strategist')"><div class="metier-dot"></div><div class="metier-name">Data Strategist</div><div class="metier-arrow">→</div></div>
+          <div class="metier" style="--node-color:var(--c1)" onclick="showPanel('data-pm')"><div class="metier-dot"></div><div class="metier-name">Data Product Manager</div><div class="metier-arrow">→</div></div>
+          <div class="metier" style="--node-color:var(--c1)" onclick="showPanel('aiml-pm')"><div class="metier-dot"></div><div class="metier-name">AI/ML Product Manager</div><div class="metier-arrow">→</div></div>
+        </div>
+      </div>
+
+      <!-- 2 GOUVERNANCE -->
+      <div class="branch">
+        <div class="branch-header">
+          <div class="branch-icon">⚖️</div>
+          <div class="branch-title" style="color:var(--c2)">Gouvernance & Qualité</div>
+          <div class="branch-count">7 rôles</div>
+        </div>
+        <div class="branch-body">
+          <div class="metier" style="--node-color:var(--c2)" onclick="showPanel('data-gov-manager')"><div class="metier-dot"></div><div class="metier-name">Data Governance Manager</div><div class="metier-arrow">→</div></div>
+          <div class="metier" style="--node-color:var(--c2)" onclick="showPanel('data-steward')"><div class="metier-dot"></div><div class="metier-name">Data Steward</div><div class="metier-arrow">→</div></div>
+          <div class="metier" style="--node-color:var(--c2)" onclick="showPanel('data-quality')"><div class="metier-dot"></div><div class="metier-name">Data Quality Manager</div><div class="metier-arrow">→</div></div>
+          <div class="sub-branch">
+            <div class="sub-branch-title"><div class="sub-accent" style="background:var(--c2)"></div>Éthique & Conformité</div>
+            <div class="sub-items">
+              <div class="metier" style="--node-color:var(--c2)" onclick="showPanel('ethics-officer')"><div class="metier-dot"></div><div class="metier-name">Data Ethics Officer</div><div class="metier-arrow">→</div></div>
+              <div class="metier" style="--node-color:var(--c2)" onclick="showPanel('dpo')"><div class="metier-dot"></div><div class="metier-name">DPO / Data Privacy Officer</div><div class="metier-arrow">→</div></div>
+              <div class="metier" style="--node-color:var(--c2)" onclick="showPanel('ai-gov')"><div class="metier-dot"></div><div class="metier-name">AI Governance Manager</div><span class="new-tag">NEW</span><div class="metier-arrow">→</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 INGÉNIERIE -->
+      <div class="branch">
+        <div class="branch-header">
+          <div class="branch-icon">⚙️</div>
+          <div class="branch-title" style="color:var(--c3)">Ingénierie & Infrastructure</div>
+          <div class="branch-count">9 rôles</div>
+        </div>
+        <div class="branch-body">
+          <div class="metier" style="--node-color:var(--c3)" onclick="showPanel('data-architect')"><div class="metier-dot"></div><div class="metier-name">Data Architect</div><div class="metier-arrow">→</div></div>
+          <div class="metier" style="--node-color:var(--c3)" onclick="showPanel('data-engineer')"><div class="metier-dot"></div><div class="metier-name">Data Engineer</div><div class="metier-arrow">→</div></div>
+          <div class="metier" style="--node-color:var(--c3)" onclick="showPanel('cloud-data-engineer')"><div class="metier-dot"></div><div class="metier-name">Cloud Data Engineer</div><div class="metier-arrow">→</div></div>
+          <div class="metier" style="--node-color:var(--c3)" onclick="showPanel('dba')"><div class="metier-dot"></div><div class="metier-name">Database Administrator</div><div class="metier-arrow">→</div></div>
+          <div class="metier" style="--node-color:var(--c3)" onclick="showPanel('data-modeler')"><div class="metier-dot"></div><div class="metier-name">Data Modeler</div><span class="new-tag">NEW</span><div class="metier-arrow">→</div></div>
+          <div class="metier" style="--node-color:var(--c3)" onclick="showPanel('dataops')"><div class="metier-dot"></div><div class="metier-name">DataOps Engineer</div><span class="new-tag">NEW</span><div class="metier-arrow">→</div></div>
+          <div class="sub-branch">
+            <div class="sub-branch-title"><div class="sub-accent" style="background:var(--c3)"></div>MLOps & Déploiement</div>
+            <div class="sub-items">
+              <div class="metier" style="--node-color:var(--c3)" onclick="showPanel('mlops-engineer')"><div class="metier-dot"></div><div class="metier-name">MLOps Engineer</div><div class="metier-arrow">→</div></div>
+              <div class="metier" style="--node-color:var(--c3)" onclick="showPanel('mlops-specialist')"><div class="metier-dot"></div><div class="metier-name">MLOps Specialist</div><div class="metier-arrow">→</div></div>
+              <div class="metier" style="--node-color:var(--c3)" onclick="showPanel('llmops')"><div class="metier-dot"></div><div class="metier-name">LLMOps Engineer</div><span class="new-tag">NEW</span><span class="trend-tag">↑ 2026</span><div class="metier-arrow">→</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 ANALYSE -->
+      <div class="branch">
+        <div class="branch-header">
+          <div class="branch-icon">🔬</div>
+          <div class="branch-title" style="color:var(--c4)">Analyse & Science des Données</div>
+          <div class="branch-count">11 rôles</div>
+        </div>
+        <div class="branch-body">
+          <div class="sub-branch">
+            <div class="sub-branch-title"><div class="sub-accent" style="background:var(--c4)"></div>Ingénierie Analytique</div>
+            <div class="sub-items">
+              <div class="metier" style="--node-color:var(--c4)" onclick="showPanel('analytics-engineer')"><div class="metier-dot"></div><div class="metier-name">Analytics Engineer</div><span class="trend-tag">↑ Hot</span><div class="metier-arrow">→</div></div>
+            </div>
+          </div>
+          <div class="sub-branch">
+            <div class="sub-branch-title"><div class="sub-accent" style="background:var(--c4)"></div>Analyse & Reporting</div>
+            <div class="sub-items">
+              <div class="metier" style="--node-color:var(--c4)" onclick="showPanel('data-analyst')"><div class="metier-dot"></div><div class="metier-name">Data Analyst</div><div class="metier-arrow">→</div></div>
+              <div class="metier" style="--node-color:var(--c4)" onclick="showPanel('business-analyst')"><div class="metier-dot"></div><div class="metier-name">Business Analyst</div><div class="metier-arrow">→</div></div>
+              <div class="metier" style="--node-color:var(--c4)" onclick="showPanel('data-translator')"><div class="metier-dot"></div><div class="metier-name">Data Translator</div><div class="metier-arrow">→</div></div>
+              <div class="metier" style="--node-color:var(--c4)" onclick="showPanel('bi-developer')"><div class="metier-dot"></div><div class="metier-name">BI Developer</div><div class="metier-arrow">→</div></div>
+            </div>
+          </div>
+          <div class="sub-branch">
+            <div class="sub-branch-title"><div class="sub-accent" style="background:var(--c4)"></div>Data Science & Machine Learning</div>
+            <div class="sub-items">
+              <div class="metier" style="--node-color:var(--c4)" onclick="showPanel('data-scientist')"><div class="metier-dot"></div><div class="metier-name">Data Scientist</div><div class="metier-arrow">→</div></div>
+              <div class="metier" style="--node-color:var(--c4)" onclick="showPanel('ml-engineer')"><div class="metier-dot"></div><div class="metier-name">ML Engineer</div><div class="metier-arrow">→</div></div>
+              <div class="metier" style="--node-color:var(--c4)" onclick="showPanel('ai-engineer')"><div class="metier-dot"></div><div class="metier-name">AI Engineer</div><span class="trend-tag">↑ N°1</span><div class="metier-arrow">→</div></div>
+              <div class="metier" style="--node-color:var(--c4)" onclick="showPanel('genai-engineer')"><div class="metier-dot"></div><div class="metier-name">GenAI / Prompt Engineer</div><span class="new-tag">NEW</span><div class="metier-arrow">→</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SIDE PANEL -->
+  <div class="side-panel" id="sidePanel">
+    <div class="panel-top" id="panelTop"></div>
+    <div class="panel-body" id="panelBody"></div>
+  </div>
+</div>
+
+<!-- SOURCES MODAL -->
+<div class="sources-overlay" id="sourcesOverlay" onclick="closeSourcesModal(event)">
+  <div class="sources-modal" id="sourcesModal">
+    <div class="sources-modal-header">
+      <div>
+        <div class="sources-modal-pretitle">Transparence des données</div>
+        <div class="sources-modal-title" id="sourcesModalTitle">Sources & Références</div>
+      </div>
+      <button class="sources-modal-close" onclick="closeSourcesModalDirect()">✕</button>
+    </div>
+    <div class="sources-modal-body" id="sourcesModalBody"></div>
+    <div class="sources-modal-footer">Dernière vérification des données : mars 2026 · Les liens ouvrent les sources officielles dans un nouvel onglet</div>
+  </div>
+</div>
+
+<!-- CAREER PATH MODAL -->
+<div class="career-overlay" id="careerOverlay" onclick="closeCareerModal(event)">
+  <div class="career-modal" id="careerModal">
+    <div class="career-modal-header">
+      <div>
+        <div class="career-modal-pretitle">Parcours d'accès au métier</div>
+        <div class="career-modal-title" id="careerModalTitle"></div>
+      </div>
+      <button class="career-modal-close" onclick="closeCareerModalDirect()">✕</button>
+    </div>
+    <div class="career-modal-body" id="careerModalBody">
+      <div class="career-loading"><div class="career-spinner"></div><span>Chargement du parcours…</span></div>
+    </div>
+    <div class="career-modal-footer">Parcours généré par IA · Basé sur les trajectoires observées sur le marché français 2026</div>
+  </div>
+</div>
+
+<!-- SKILL TOOLTIP OVERLAY -->
+<div class="skill-overlay" id="skillOverlay" onclick="closeSkillTooltip(event)">
+  <div class="skill-tooltip" id="skillTooltip">
+    <div class="skill-tooltip-header">
+      <div class="skill-tooltip-title" id="skillTooltipTitle"></div>
+      <button class="skill-tooltip-close" onclick="closeSkillTooltipDirect()">✕</button>
+    </div>
+    <div class="skill-tooltip-body" id="skillTooltipBody">
+      <div class="skill-tooltip-loading">
+        <div class="skill-spinner"></div>
+        <span>Chargement de la définition…</span>
+      </div>
+    </div>
+    <div class="skill-tooltip-footer" id="skillTooltipFooter">
+      Définition générée par IA · Contexte : écosystème des métiers de la Data 2026
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DATA — v3 — Corrections factuelles appliquées le 09/03/2026
+   Sources :
+   - Salaires : Factoriel (Q4 2025), Licorne Society (mars 2026), Glassdoor France (janv. 2026), Apec (2025)
+   - Tendances : LinkedIn France Jobs on the Rise 2026 (officiel), PwC AI Jobs Barometer 2025
+   - Réglementaire : Règlement UE 2024/1689 (EU AI Act), CNIL, Journal Officiel UE
+   ============================================================ */
+const DATA = {
+
+  /* ===== DIRECTION & STRATÉGIE ===== */
+  cdo: {
+    title: "Chief Data Officer (CDO)", branch: "Direction & Stratégie", color: "#112c53",
+    tags: ["C-Suite", "Stratégie", "Leadership"],
+    desc: "Le CDO est le garant de la vision data de l'organisation. Il définit la stratégie data globale, pilote la gouvernance, valorise les actifs data et aligne les initiatives avec les objectifs business. Rôle transversal, il supervise l'ensemble des quatre branches de l'écosystème.",
+    skills: ["Stratégie d'entreprise", "Gouvernance de la donnée", "Leadership & change management", "Data monetization", "Communication C-Level", "Gestion budgétaire"],
+    tools: [{i:"📊", n:"Plateformes BI (Power BI, Tableau)"}, {i:"🗄️", n:"Plateformes Data Mesh"}, {i:"📋", n:"OKR / Balanced Scorecard"}],
+    level: "C-Level / Directeur (12+ ans d'expérience)",
+    salary: "90–160k€", salaryNote: "Paris · médiane ~110k€ · Licorne Society, mars 2026",
+    trend: 65,
+    market: "Présent dans ~60% des grandes organisations françaises. Marché stabilisé après forte croissance 2020-2024. Salaire pouvant dépasser 160k€ pour les profils avec 12+ ans d'expérience en grand groupe.",
+    source: "Licorne Society (mars 2026), Glassdoor France (janv. 2026)"
+  },
+
+  cao: {
+    title: "Chief Analytics Officer (CAO)", branch: "Direction & Stratégie", color: "#112c53",
+    tags: ["C-Suite", "Analytics", "Leadership"],
+    desc: "Le CAO dirige la stratégie analytique de l'entreprise. Il transforme les données en insights décisionnels et supervise les équipes d'analyse, de data science et de BI. Il est le pont entre la performance analytique et les décisions stratégiques.",
+    skills: ["Analytics avancé", "Modélisation statistique", "Leadership analytique", "Communication exécutive", "Mesure du ROI", "Gestion d'équipes data"],
+    tools: [{i:"📈", n:"Plateformes BI avancées"}, {i:"🧠", n:"Outils de Data Science"}, {i:"📋", n:"Reporting C-Level"}],
+    level: "C-Level / Directeur (10+ ans)",
+    salary: "85–150k€", salaryNote: "Paris · souvent fusionné avec le CDO dans les PME",
+    trend: 60,
+    market: "Rôle distinct du CDO dans les grandes entreprises data-driven. Souvent absent dans les structures de moins de 500 personnes.",
+    source: "Glassdoor France, Apec (2025)"
+  },
+
+  caio: {
+    title: "Chief AI Officer (CAIO)", branch: "Direction & Stratégie", color: "#112c53",
+    tags: ["C-Suite", "IA", "Nouveau 2025", "LinkedIn N°2 France 2026"], isNew: true,
+    desc: "Rôle en forte émergence depuis 2024. Le CAIO définit et pilote la stratégie IA de l'organisation, supervise les initiatives GenAI, assure la conformité au Règlement UE 2024/1689 (EU AI Act — application progressive 2024-2026) et crée une culture d'adoption de l'IA.",
+    skills: ["Stratégie IA & GenAI", "Règlement UE 2024/1689 (EU AI Act) — application progressive", "Gestion de portefeuille IA", "Leadership tech", "Change management", "Éthique de l'IA"],
+    tools: [{i:"🤖", n:"Plateformes LLM (OpenAI, Anthropic, Mistral)"}, {i:"☁️", n:"Cloud AI Services (AWS, GCP, Azure)"}, {i:"📋", n:"Frameworks gouvernance IA"}],
+    level: "C-Level / Directeur (10+ ans, dont IA)",
+    salary: "100–180k€", salaryNote: "Paris · marché en formation, forte variance",
+    trend: 92,
+    market: "N°2 des métiers en plus forte croissance en France (LinkedIn Jobs on the Rise 2026). ~1 grande organisation sur 3 dispose d'un CAIO en 2026. Croissance portée par l'EU AI Act et la généralisation de la GenAI.",
+    source: "LinkedIn France Jobs on the Rise 2026 (officiel), PwC AI Jobs Barometer 2025"
+  },
+
+  'data-strategist': {
+    title: "Data Strategist", branch: "Direction & Stratégie", color: "#112c53",
+    tags: ["Stratégie", "Conseil", "Senior"],
+    desc: "Le Data Strategist conçoit les feuilles de route data pour aligner les investissements data avec les priorités business. Il identifie les opportunités de valeur, évalue la maturité data de l'organisation et définit les priorités d'investissement.",
+    skills: ["Stratégie data", "Analyse de maturité data (CMMI, DMM)", "Roadmap planning", "Business acumen", "Gestion des parties prenantes", "Data economics"],
+    tools: [{i:"📋", n:"Frameworks de maturité data (CMMI, DMM)"}, {i:"📊", n:"Outils de cartographie stratégique"}, {i:"🎯", n:"OKR & KPI frameworks"}],
+    level: "Senior / Lead (7+ ans)",
+    salary: "70–115k€", salaryNote: "Paris · souvent intégré au CDO dans les PME",
+    trend: 58,
+    market: "Rôle indépendant surtout dans les grands groupes et cabinets de conseil. Demande stable.",
+    source: "Apec, Glassdoor France (2025)"
+  },
+
+  'data-pm': {
+    title: "Data Product Manager", branch: "Direction & Stratégie", color: "#112c53",
+    tags: ["Produit", "Agile", "Business"],
+    desc: "Le Data Product Manager pilote le développement de produits data (datasets, APIs, dashboards) en appliquant une approche produit. Il priorise le backlog data et s'assure que les livrables data créent de la valeur métier mesurable.",
+    skills: ["Product management", "Agile / Scrum", "Priorisation backlog", "User research", "Métriques produit", "Collaboration cross-fonctionnelle"],
+    tools: [{i:"📋", n:"Jira / Linear"}, {i:"🎨", n:"Figma (prototypage)"}, {i:"📊", n:"Analytics produit (Mixpanel, Amplitude)"}],
+    level: "Confirmé / Senior (4–8 ans)",
+    salary: "60–100k€", salaryNote: "Paris · forte demande dans les scale-ups",
+    trend: 70,
+    market: "En forte croissance avec la productisation des actifs data. Très recherché dans les entreprises data-driven.",
+    source: "Licorne Society (2026), Welcome to the Jungle (2025)"
+  },
+
+  'aiml-pm': {
+    title: "AI/ML Product Manager", branch: "Direction & Stratégie", color: "#112c53",
+    tags: ["IA", "Produit", "ML"],
+    desc: "Spécialisation du Data PM centrée sur les produits intégrant de l'IA ou du machine learning. Il maîtrise les contraintes techniques des modèles ML (biais, latence, drift) pour les traduire en décisions produit et gérer les attentes des parties prenantes.",
+    skills: ["Fondamentaux ML", "Product management", "Évaluation de modèles", "Éthique IA", "Communication technique", "Gestion du risque IA"],
+    tools: [{i:"🤖", n:"Plateformes ML (Vertex AI, SageMaker)"}, {i:"📋", n:"MLflow (suivi d'expériences)"}, {i:"📊", n:"Dashboards monitoring modèles"}],
+    level: "Confirmé / Senior (4–8 ans)",
+    salary: "65–110k€", salaryNote: "Paris · prime de +10–15% vs Data PM classique",
+    trend: 85,
+    market: "Un des profils les plus recherchés en 2025-2026. La spécialisation IA devient un critère différenciant fort.",
+    source: "LinkedIn France Jobs on the Rise 2026, Factoriel (Q4 2025)"
+  },
+
+  /* ===== GOUVERNANCE & QUALITÉ ===== */
+  'data-gov-manager': {
+    title: "Data Governance Manager", branch: "Gouvernance & Qualité", color: "#ac0035",
+    tags: ["Gouvernance", "Rôle central", "Pilier"],
+    desc: "Rôle central de la branche Gouvernance. Il conçoit et met en œuvre le cadre de gouvernance des données : politiques, standards, processus, comités data. Il coordonne les Data Stewards à travers l'organisation et assure la conformité réglementaire.",
+    skills: ["Frameworks DAMA / DCAM", "Catalogues de données", "Conformité réglementaire", "Animation de comités data", "Data lineage", "Change management"],
+    tools: [{i:"📚", n:"Collibra / Alation"}, {i:"🗄️", n:"Catalogues de métadonnées"}, {i:"📋", n:"Outils de conformité (OneTrust)"}],
+    level: "Senior / Manager (6+ ans)",
+    salary: "40–75k€", salaryNote: "Paris · rôle rare en start-up, surtout en grands groupes",
+    trend: 65,
+    market: "Indispensable dans toute organisation data mature. Généralement absent dans les structures de moins de 100 personnes.",
+    source: "Licorne Society (mars 2026)"
+  },
+
+  'data-steward': {
+    title: "Data Steward", branch: "Gouvernance & Qualité", color: "#ac0035",
+    tags: ["Gouvernance", "Terrain", "Qualité"],
+    desc: "Le Data Steward est le gardien opérationnel de la qualité et de la conformité des données dans un domaine métier spécifique. Il applique les politiques de gouvernance, résout les problèmes de qualité et maintient le catalogue de données de son périmètre.",
+    skills: ["Connaissance métier approfondie", "Qualité des données", "Documentation", "Résolution de conflits data", "Catalogage", "SQL de base"],
+    tools: [{i:"📚", n:"Catalogues de données"}, {i:"✅", n:"Outils de qualité data"}, {i:"📋", n:"Outils de ticketing (Jira, ServiceNow)"}],
+    level: "Confirmé (3–6 ans)",
+    salary: "38–65k€", salaryNote: "Paris · souvent exercé en complément d'un rôle métier",
+    trend: 52,
+    market: "Rôle stable, surtout en grande entreprise. Souvent combiné à une expertise métier (finance, RH, marketing).",
+    source: "Licorne Society (2026), Glassdoor France (2025)"
+  },
+
+  'data-quality': {
+    title: "Data Quality Manager", branch: "Gouvernance & Qualité", color: "#ac0035",
+    tags: ["Qualité", "Processus", "Mesure"],
+    desc: "Spécialiste de la qualité des données, il définit les métriques de qualité (complétude, exactitude, cohérence, unicité), met en place les processus de contrôle et pilote les initiatives d'amélioration continue à l'échelle de l'organisation.",
+    skills: ["Métriques qualité data (DAMA)", "Data profiling", "Processus qualité", "Six Sigma / Lean", "Reporting qualité", "Remédiation de données"],
+    tools: [{i:"🔍", n:"Great Expectations / Soda"}, {i:"📊", n:"Monte Carlo (observabilité)"}, {i:"🛠️", n:"dbt (tests qualité)"}],
+    level: "Confirmé / Senior (4–8 ans)",
+    salary: "45–80k€", salaryNote: "Paris",
+    trend: 60,
+    market: "Demande croissante liée aux réglementations (RGPD, Directive NIS2) et aux besoins de fiabilité des modèles IA.",
+    source: "Glassdoor France, Apec (2025)"
+  },
+
+  'ethics-officer': {
+    title: "Data Ethics Officer", branch: "Gouvernance & Qualité", color: "#ac0035",
+    tags: ["Éthique", "Conformité", "IA"],
+    desc: "Garant de l'utilisation éthique des données et des algorithmes. Il évalue les risques éthiques des projets data/IA, définit les lignes directrices et sensibilise les équipes aux biais algorithmiques et aux impacts sociaux des systèmes IA.",
+    skills: ["Éthique appliquée", "Détection de biais algorithmiques", "Évaluation d'impact (AIPD/DPIA)", "Droit numérique", "Communication", "Philosophie de l'IA"],
+    tools: [{i:"🔍", n:"Outils de fairness ML (IBM AI Fairness 360, Fairlearn)"}, {i:"📋", n:"Frameworks d'évaluation éthique"}, {i:"📚", n:"Outils d'audit algorithmique"}],
+    level: "Senior / Expert (6+ ans)",
+    salary: "55–95k€", salaryNote: "Paris",
+    trend: 72,
+    market: "Rôle en forte montée avec l'entrée en vigueur progressive du Règlement UE 2024/1689 (EU AI Act). Distinction croissante avec l'AI Governance Manager qui traite de la conformité légale formelle.",
+    source: "LinkedIn France Jobs on the Rise 2026"
+  },
+
+  dpo: {
+    title: "DPO / Data Privacy Officer", branch: "Gouvernance & Qualité", color: "#ac0035",
+    tags: ["RGPD", "Conformité légale", "Obligatoire"],
+    desc: "Le DPO (Délégué à la Protection des Données) est le responsable légal de la protection des données personnelles au sens du RGPD (Règlement UE 2016/679). Obligatoire pour les organismes publics, les entreprises traitant des données sensibles à grande échelle et les entreprises dont l'activité principale implique un suivi régulier et systématique des personnes, il est l'interlocuteur officiel de la CNIL.",
+    skills: ["RGPD (Règlement UE 2016/679)", "Directive ePrivacy & Règlement ePrivacy (en cours)", "DORA (Règlement UE 2022/2554 — secteur financier uniquement)", "Analyse d'impact AIPD/DPIA", "Droit des données personnelles", "Relations CNIL & autorités européennes"],
+    tools: [{i:"📋", n:"Registre des traitements (Art. 30 RGPD)"}, {i:"🔒", n:"Outils RGPD (OneTrust, Didomi, Axeptio)"}, {i:"📚", n:"Documentation légale et jurisprudence CJUE"}],
+    level: "Expert / Manager (6+ ans, certification CNIL recommandée)",
+    salary: "45–110k€", salaryNote: "Paris · médiane ~70k€ · forte variance selon taille et secteur",
+    trend: 62,
+    market: "Obligatoire par la loi dans de nombreuses structures (Art. 37 RGPD). Marché mature mais stable. Les compétences en gouvernance IA (EU AI Act) enrichissent le rôle en 2026. Note : DORA s'applique spécifiquement aux entités financières (banques, assurances, prestataires IT critiques).",
+    source: "CNIL.fr, Règlement UE 2016/679 (RGPD), Glassdoor France (2025)"
+  },
+
+  'ai-gov': {
+    title: "AI Governance Manager", branch: "Gouvernance & Qualité", color: "#ac0035",
+    tags: ["EU AI Act 2024/1689", "Nouveau 2025-2026", "Conformité IA"], isNew: true,
+    desc: "Rôle critique né du Règlement UE 2024/1689 (EU AI Act), en vigueur depuis le 1er août 2024 avec application progressive. Il pilote la conformité des systèmes IA : classification des risques (Art. 6-9), documentation technique obligatoire, surveillance humaine (Art. 14), tenue du registre EU des systèmes IA à haut risque (Art. 60). Distinct du Data Ethics Officer qui traite de l'éthique générale non réglementaire.",
+    skills: ["Règlement UE 2024/1689 — calendrier : interdictions (fév. 2025), GPAI (août 2025), haut risque (août 2026)", "Classification des risques IA (inacceptable / haut / limité / minimal)", "Audit de systèmes IA et documentation technique (Annexe IV)", "Gouvernance algorithmique & registre des systèmes IA", "Liaison avec les autorités nationales de contrôle (CNIL en France)", "Conformité GPAI (General Purpose AI — Titre VIII)"],
+    tools: [{i:"📋", n:"Frameworks conformité EU AI Act (Règlement 2024/1689)"}, {i:"🔍", n:"Outils d'audit IA (IBM OpenScale, Credo AI)"}, {i:"📚", n:"Registre EU systèmes IA (Art. 60) & base de données EAIA"}],
+    level: "Senior / Expert (6+ ans, droit + data + IA)",
+    salary: "65–120k€", salaryNote: "Paris · marché en formation · pénurie critique de profils en 2026",
+    trend: 95,
+    market: "Demande explosive depuis l'EU AI Act (application complète haut risque : août 2026). Profil en pénurie critique en France et en Europe. Les premières sanctions peuvent atteindre 35 millions € ou 7% du CA mondial.",
+    source: "Règlement UE 2024/1689 (JOUE L 2024/1689), LinkedIn France Jobs on the Rise 2026"
+  },
+
+  /* ===== INGÉNIERIE & INFRASTRUCTURE ===== */
+  'data-architect': {
+    title: "Data Architect", branch: "Ingénierie & Infrastructure", color: "#836822",
+    tags: ["Architecture", "Conception", "Senior"],
+    desc: "Le Data Architect conçoit l'architecture globale des systèmes de données : modèles de données, flux d'intégration, choix technologiques. Il garantit la cohérence, la scalabilité et la performance de l'ensemble de l'infrastructure data (Lakehouse, Data Mesh, etc.).",
+    skills: ["Architecture data (Data Mesh, Lakehouse, Data Vault 2.0)", "Modélisation conceptuelle & physique", "Patterns d'intégration (ELT, CDC, streaming)", "Cloud architecture (AWS, GCP, Azure)", "Sécurité des données", "Gouvernance technique"],
+    tools: [{i:"🏗️", n:"erwin / dbdiagram.io / PowerDesigner"}, {i:"☁️", n:"AWS Well-Architected / GCP / Azure"}, {i:"🔄", n:"Architecture Decision Records (ADR)"}],
+    level: "Senior / Architecte (8+ ans)",
+    salary: "70–140k€", salaryNote: "Paris — confirmé (70–85k€) à expert (110–140k€) · Factoriel Q4 2025",
+    trend: 68,
+    market: "Profil rare et très valorisé. La demande dépasse l'offre sur les profils seniors, notamment sur les architectures Data Mesh et Lakehouse.",
+    source: "Factoriel (Q4 2025)"
+  },
+
+  'data-engineer': {
+    title: "Data Engineer", branch: "Ingénierie & Infrastructure", color: "#836822",
+    tags: ["Pipelines", "ETL/ELT", "Rôle le plus recruté"],
+    desc: "Le Data Engineer construit et maintient les pipelines de données qui alimentent l'organisation. Il collecte, transforme et stocke les données pour les rendre exploitables. C'est le rôle le plus recruté de l'écosystème data pour la 3ème année consécutive en France.",
+    skills: ["Python / Scala", "SQL avancé", "Apache Spark / Flink", "Orchestration (Airflow, Prefect, Dagster)", "Data warehousing (Kimball, Data Vault)", "Streaming temps réel (Kafka, Flink)"],
+    tools: [{i:"⚡", n:"Apache Spark"}, {i:"🔄", n:"dbt (transformation)"}, {i:"📋", n:"Airflow / Prefect / Dagster"}, {i:"🗄️", n:"Snowflake / BigQuery / Databricks"}],
+    level: "Junior à Senior (0–10 ans)",
+    salary: "45–90k€", salaryNote: "Paris — junior (45–52k€) · confirmé (55–70k€) · senior (70–90k€) · Factoriel Q4 2025",
+    trend: 82,
+    market: "Rôle le plus recruté en data France pour la 3ème année consécutive (Factoriel). La demande dépasse largement l'offre de profils seniors.",
+    source: "Factoriel (Q4 2025), Licorne Society (mars 2026)"
+  },
+
+  'cloud-data-engineer': {
+    title: "Cloud Data Engineer", branch: "Ingénierie & Infrastructure", color: "#836822",
+    tags: ["Cloud", "Infrastructure", "Spécialisation"],
+    desc: "Spécialisation du Data Engineer focalisée sur les architectures cloud natives. Il conçoit et déploie des solutions data sur AWS, GCP ou Azure, optimise les coûts cloud et maîtrise les services managés de chaque fournisseur.",
+    skills: ["AWS / GCP / Azure (services data managés)", "Infrastructure as Code (Terraform, Pulumi)", "Containerisation (Docker, Kubernetes)", "Sécurité cloud (IAM, encryption at rest/transit)", "Optimisation des coûts cloud (FinOps)", "Architectures serverless"],
+    tools: [{i:"☁️", n:"AWS Glue / Redshift / S3 · GCP BigQuery / Dataflow · Azure Synapse"}, {i:"🔧", n:"Terraform / Pulumi"}, {i:"🐳", n:"Kubernetes (EKS, GKE, AKS)"}, {i:"📊", n:"Databricks on Cloud"}],
+    level: "Confirmé / Senior (4–8 ans)",
+    salary: "58–100k€", salaryNote: "Paris · prime cloud estimée +8–12% vs Data Engineer classique",
+    trend: 78,
+    market: "Très forte demande avec la migration massive vers le cloud. La certification cloud (AWS SAA, GCP PDE, Azure DP-203) est un différenciateur fort.",
+    source: "Factoriel (Q4 2025), LinkedIn France (2026)"
+  },
+
+  dba: {
+    title: "Database Administrator (DBA)", branch: "Ingénierie & Infrastructure", color: "#836822",
+    tags: ["Base de données", "Performance", "Fiabilité"],
+    desc: "Le DBA assure la disponibilité, la performance, la sécurité et l'intégrité des bases de données. Il gère les sauvegardes, optimise les requêtes, effectue le tuning et planifie la capacité. Rôle fondamental pour la fiabilité opérationnelle.",
+    skills: ["SQL avancé & query tuning", "Administration SGBD (PostgreSQL, Oracle, SQL Server, MySQL)", "Backup & disaster recovery (RPO/RTO)", "Haute disponibilité (réplication, clustering)", "Sécurité BDD (audit, chiffrement)", "Monitoring de performance"],
+    tools: [{i:"🐘", n:"PostgreSQL / Oracle / SQL Server / MySQL"}, {i:"📊", n:"pgAdmin / DBeaver"}, {i:"🔍", n:"Datadog / Zabbix / pgBadger (monitoring)"}],
+    level: "Confirmé / Senior (4–10 ans)",
+    salary: "42–78k€", salaryNote: "Paris · rôle en transformation vers le Cloud DBA",
+    trend: 42,
+    market: "Rôle stable mais en transformation profonde. Les BDD managées cloud réduisent les tâches d'administration manuelle. Évolution vers Cloud DBA ou DataOps.",
+    source: "Glassdoor France, Apec (2025)"
+  },
+
+  'data-modeler': {
+    title: "Data Modeler", branch: "Ingénierie & Infrastructure", color: "#836822",
+    tags: ["Modélisation", "Conception", "Qualité structurelle"],
+    desc: "Le Data Modeler crée les modèles de données logiques et physiques qui structurent l'information dans l'organisation. Expert des schémas relationnels, dimensionnels et des ontologies, il garantit la cohérence sémantique et la qualité structurelle des données.",
+    skills: ["Modélisation conceptuelle / logique / physique", "Merise / UML", "Data Vault 2.0 / Kimball / Inmon", "SQL", "Documentation technique", "Ontologies & taxonomies"],
+    tools: [{i:"🏗️", n:"erwin Data Modeler"}, {i:"📐", n:"PowerDesigner / SAP"}, {i:"🗄️", n:"dbdiagram.io / Miro"}],
+    level: "Confirmé / Senior (4–8 ans)",
+    salary: "48–82k€", salaryNote: "Paris · rôle souvent sous-estimé, critique pour la qualité des entrepôts",
+    trend: 55,
+    market: "Rôle souvent fusionné avec le Data Architect dans les petites équipes. Demande stable dans les grandes DSI.",
+    source: "Glassdoor France, Apec (2025)"
+  },
+
+  dataops: {
+    title: "DataOps Engineer", branch: "Ingénierie & Infrastructure", color: "#836822",
+    tags: ["DevOps appliqué à la data", "Automatisation", "Nouveau 2025"],
+    isNew: true,
+    desc: "Le DataOps Engineer applique les principes DevOps aux pipelines de données : CI/CD pour les workflows data, tests automatisés, monitoring des pipelines, gestion des versions de données. Il améliore la vélocité et la fiabilité des livraisons data.",
+    skills: ["CI/CD data (GitHub Actions, GitLab CI)", "Tests automatisés de données (contrats de données)", "Observabilité des pipelines (data lineage, alerting)", "Infrastructure as Code", "Python", "Versioning de données (DVC, lakeFS)"],
+    tools: [{i:"🔄", n:"dbt + tests de données"}, {i:"⚡", n:"Great Expectations / Soda"}, {i:"🐙", n:"GitHub Actions / GitLab CI"}, {i:"📊", n:"Monte Carlo / Datafold (observabilité)"}],
+    level: "Confirmé / Senior (4–7 ans)",
+    salary: "55–95k€", salaryNote: "Paris",
+    trend: 82,
+    market: "Rôle en forte croissance. L'industrialisation des pipelines data devient critique pour les organisations data-driven.",
+    source: "LinkedIn France Jobs on the Rise 2026, Factoriel (Q4 2025)"
+  },
+
+  'mlops-engineer': {
+    title: "MLOps Engineer", branch: "Ingénierie & Infrastructure", color: "#836822",
+    tags: ["MLOps", "Production ML", "Pipelines"],
+    desc: "Le MLOps Engineer déploie et maintient les modèles de machine learning en production. Il automatise le cycle de vie complet des modèles (entraînement, déploiement, monitoring, retraining), assure la reproductibilité et surveille la performance des modèles en conditions réelles.",
+    skills: ["Déploiement de modèles ML (REST API, batch, edge)", "Monitoring (data drift, concept drift, métriques de performance)", "MLflow / Kubeflow / Metaflow", "Docker / Kubernetes", "CI/CD pour ML", "Feature stores"],
+    tools: [{i:"🔬", n:"MLflow (tracking & model registry)"}, {i:"⚙️", n:"Kubeflow / Metaflow / ZenML"}, {i:"🐳", n:"Docker / Kubernetes"}, {i:"📊", n:"Evidently AI / Arize / Whylogs (monitoring)"}],
+    level: "Confirmé / Senior (4–8 ans)",
+    salary: "48–100k€", salaryNote: "Paris — junior (48–55k€) · senior (80–100k€) · expert Lead (100–125k€) · Factoriel Q4 2025",
+    trend: 85,
+    market: "Un des rôles les plus demandés — pont essentiel entre Data Science et production. La pénurie de profils seniors est réelle et durable.",
+    source: "Factoriel (Q4 2025)"
+  },
+
+  'mlops-specialist': {
+    title: "MLOps Specialist", branch: "Ingénierie & Infrastructure", color: "#836822",
+    tags: ["MLOps", "Expert", "Architecture"],
+    desc: "Profil expert senior du domaine MLOps. Le Specialist intervient en architecture ou en conseil. Il définit les standards MLOps de l'organisation, sélectionne les plateformes et accompagne les équipes dans la mise en place des pratiques MLOps à l'échelle.",
+    skills: ["Architecture MLOps", "Plateformes ML managées (Vertex AI, SageMaker, AzureML)", "Gouvernance des modèles", "Feature engineering avancé", "Sécurité ML (model robustness, adversarial attacks)", "Formation & coaching d'équipes"],
+    tools: [{i:"☁️", n:"AWS SageMaker / GCP Vertex AI / Azure ML"}, {i:"🏗️", n:"Tecton / Feast (feature store)"}, {i:"📋", n:"Weights & Biases / Comet ML"}],
+    level: "Senior / Expert / Lead (8+ ans)",
+    salary: "72–120k€", salaryNote: "Paris",
+    trend: 78,
+    market: "Profil rare, souvent en consulting ou dans les grandes DSI. La distinction avec MLOps Engineer tient au niveau de séniorité et à l'orientation architecture.",
+    source: "Factoriel (Q4 2025), LinkedIn France (2026)"
+  },
+
+  llmops: {
+    title: "LLMOps Engineer", branch: "Ingénierie & Infrastructure", color: "#836822",
+    tags: ["LLM", "GenAI", "Nouveau 2026", "Émergent"],
+    isNew: true,
+    desc: "Rôle émergent en très forte croissance en 2026. Spécialisation du MLOps aux Large Language Models : déploiement de modèles GenAI, gestion des pipelines RAG en production, monitoring des hallucinations, optimisation des coûts d'inférence, fine-tuning et sécurisation des LLMs.",
+    skills: ["Déploiement de LLMs open source (Llama, Mistral) & propriétaires (GPT-4o, Claude)", "RAG (Retrieval-Augmented Generation) en production", "Fine-tuning (LoRA, QLoRA, RLHF, DPO)", "Monitoring LLM (hallucinations, latence, coûts d'inférence)", "Vector databases (indexation, requêtage)", "Sécurité LLM (prompt injection, jailbreak, data leakage)"],
+    tools: [{i:"🤖", n:"LangChain / LlamaIndex / Haystack"}, {i:"🔍", n:"Pinecone / Weaviate / Qdrant / Chroma (vector DB)"}, {i:"📊", n:"LangSmith / Helicone / Phoenix / Traceloop (monitoring LLM)"}, {i:"🤗", n:"Hugging Face (déploiement, fine-tuning PEFT)"}],
+    level: "Confirmé / Senior (3–7 ans, dont spécialisation LLM récente)",
+    salary: "52–130k€", salaryNote: "Paris — junior (52–62k€) · confirmé (70–90k€) · expert (120–160k€) · Factoriel Q4 2025",
+    trend: 97,
+    market: "Rôle infrastructure le plus recherché en 2026. Pénurie critique de profils. +12% d'inflation salariale sur les experts GenAI vs 2025 (Factoriel).",
+    source: "Factoriel (Q4 2025), LinkedIn France Jobs on the Rise 2026"
+  },
+
+  /* ===== ANALYSE & SCIENCE DES DONNÉES ===== */
+  'analytics-engineer': {
+    title: "Analytics Engineer", branch: "Analyse & Science des Données", color: "#1a6b4a",
+    tags: ["Pont Ingénierie/Analyse", "dbt", "Top 3 France 2026"],
+    desc: "L'Analytics Engineer est le pont entre le Data Engineer et le Data Analyst. Il transforme les données brutes en modèles analytiques propres, documentés et testés, accessibles en self-service aux analystes et aux équipes métier. La maîtrise de SQL avancé et de dbt est indispensable.",
+    skills: ["SQL avancé (window functions, CTEs, macros dbt)", "dbt (data build tool — core & cloud)", "Modélisation analytique (Kimball star schema, OBT)", "Documentation & data lineage automatisé", "Tests de données (unicité, fraîcheur, contraintes)", "Git / version control"],
+    tools: [{i:"🔧", n:"dbt Core / dbt Cloud"}, {i:"🗄️", n:"Snowflake / BigQuery / Databricks"}, {i:"📊", n:"Looker / Metabase / Lightdash"}, {i:"🐙", n:"Git / GitHub / GitLab"}],
+    level: "Confirmé / Senior (3–7 ans)",
+    salary: "45–95k€", salaryNote: "Paris — junior (45–50k€) · confirmé (52–65k€) · senior (65–80k€) · expert (80–95k€) · Factoriel Q4 2025",
+    trend: 90,
+    market: "Top 3 des rôles data les plus recherchés en France en 2025-2026 (Factoriel). La demande dépasse largement l'offre, notamment sur les profils seniors maîtrisant dbt et Snowflake.",
+    source: "Factoriel (Q4 2025), Licorne Society (mars 2026)"
+  },
+
+  'data-analyst': {
+    title: "Data Analyst", branch: "Analyse & Science des Données", color: "#1a6b4a",
+    tags: ["Analyse", "Reporting", "Porte d'entrée data"],
+    desc: "Le Data Analyst explore, analyse et visualise les données pour produire des insights actionnables pour les équipes métier. Il répond aux questions business en exploitant les données disponibles et communique ses résultats via des dashboards et rapports clairs.",
+    skills: ["SQL (requêtes analytiques complexes)", "Python ou R (pandas, numpy, scipy)", "Visualisation (Power BI, Tableau, Looker)", "Statistiques descriptives et inférentielles", "Excel avancé (Power Query, Power Pivot)", "Storytelling data"],
+    tools: [{i:"📊", n:"Power BI / Tableau / Looker"}, {i:"🐍", n:"Python (pandas, matplotlib, seaborn)"}, {i:"🗄️", n:"SQL / BigQuery / Snowflake"}, {i:"📋", n:"Google Sheets / Excel avancé"}],
+    level: "Junior à Senior (0–8 ans)",
+    salary: "40–70k€", salaryNote: "Paris — junior (40–50k€) · confirmé (50–60k€) · senior (60–70k€) · Licorne Society mars 2026",
+    trend: 65,
+    market: "Rôle fondamental et porte d'entrée courante dans la data. Demande stable. Les profils évoluent souvent vers Analytics Engineer ou Data Scientist.",
+    source: "Factoriel (Q4 2025), Licorne Society (mars 2026)"
+  },
+
+  'business-analyst': {
+    title: "Business Analyst", branch: "Analyse & Science des Données", color: "#1a6b4a",
+    tags: ["Métier", "Analyse fonctionnelle", "Traduction"],
+    desc: "Le Business Analyst fait le lien entre les besoins métier et les solutions data/SI. Il analyse les processus, identifie les opportunités d'amélioration, rédige les spécifications fonctionnelles et valide que les livrables data répondent aux besoins réels de l'organisation.",
+    skills: ["Analyse des besoins métier", "Modélisation de processus (BPMN 2.0, UML)", "Rédaction de spécifications fonctionnelles", "SQL de base", "Gestion des parties prenantes", "Tests fonctionnels et recette (UAT)"],
+    tools: [{i:"📋", n:"Confluence / Notion"}, {i:"🔄", n:"Jira / Azure DevOps"}, {i:"📊", n:"Power BI / Excel"}, {i:"🎨", n:"Miro / Lucidchart (modélisation BPMN)"}],
+    level: "Junior à Senior (0–10 ans)",
+    salary: "38–72k€", salaryNote: "Paris · profil présent dans tous les secteurs",
+    trend: 58,
+    market: "Profil polyvalent, demande stable dans tous les secteurs. L'évolution vers des compétences data (SQL, BI) est de plus en plus attendue.",
+    source: "Apec, Glassdoor France (2025)"
+  },
+
+  'data-translator': {
+    title: "Data Translator", branch: "Analyse & Science des Données", color: "#1a6b4a",
+    tags: ["Interface métier/data", "Communication", "Émergent"],
+    desc: "Le Data Translator est l'interprète entre les équipes data techniques et les décideurs métier. Il traduit les résultats analytiques complexes en recommandations business claires, identifie les use cases data à fort ROI et facilite l'adoption des solutions data dans l'organisation.",
+    skills: ["Communication cross-fonctionnelle", "Connaissance métier large (finance, marketing, RH...)", "Vulgarisation de concepts techniques", "Identification d'opportunités data & ROI", "Storytelling data et présentation exécutive", "Bases en data science et statistiques"],
+    tools: [{i:"📊", n:"Outils de visualisation et présentation (Tableau, Power BI)"}, {i:"📋", n:"Frameworks de storytelling data"}, {i:"🎨", n:"Canva / PowerPoint / Figma"}],
+    level: "Confirmé / Senior (5+ ans, dont expérience métier)",
+    salary: "48–85k€", salaryNote: "Paris · rôle rare, valorisé dans les grandes organisations",
+    trend: 52,
+    market: "Rôle encore rare mais valorisé dans les grandes organisations. Profil souvent issu du conseil ou du métier reconverti data.",
+    source: "McKinsey Global Institute, Apec (2025)"
+  },
+
+  'bi-developer': {
+    title: "BI Developer", branch: "Analyse & Science des Données", color: "#1a6b4a",
+    tags: ["Business Intelligence", "Reporting", "Dashboards"],
+    desc: "Le Business Intelligence Developer conçoit et développe les solutions de reporting et de tableaux de bord de l'organisation. Il maîtrise les outils BI, développe les modèles sémantiques (DAX, LookML), optimise les requêtes et forme les utilisateurs au self-service BI.",
+    skills: ["Power BI / Tableau / Qlik / Looker", "DAX / MDX (modélisation sémantique)", "SQL avancé", "Modélisation sémantique (star schema, mesures calculées)", "ETL léger (Power Query, Tableau Prep)", "UX des dashboards et data visualization"],
+    tools: [{i:"📊", n:"Power BI (DAX, Power Query, Dataflows)"}, {i:"🔧", n:"DAX Studio / Tabular Editor 3"}, {i:"🗄️", n:"SQL Server / Snowflake / BigQuery"}, {i:"🎨", n:"Figma (maquettes BI)"}],
+    level: "Junior à Senior (0–8 ans)",
+    salary: "40–76k€", salaryNote: "Paris",
+    trend: 62,
+    market: "Demande stable. L'essor du self-service BI fait évoluer le rôle vers plus de conseil, de formation des utilisateurs et de gouvernance des modèles sémantiques.",
+    source: "Glassdoor France, Apec (2025)"
+  },
+
+  'data-scientist': {
+    title: "Data Scientist", branch: "Analyse & Science des Données", color: "#1a6b4a",
+    tags: ["ML", "Statistiques", "Modélisation prédictive"],
+    desc: "Le Data Scientist construit des modèles statistiques et de machine learning pour résoudre des problèmes business complexes : prédiction, classification, clustering, détection d'anomalies, recommandation. Il combine expertise mathématique, code et sens du business.",
+    skills: ["Python (scikit-learn, XGBoost, LightGBM, statsmodels)", "Statistiques & probabilités (inférence, tests, distributions)", "Machine Learning supervisé & non-supervisé", "Expérimentation (A/B testing, tests statistiques, causalité)", "Feature engineering & sélection de variables", "Communication et présentation des résultats aux métiers"],
+    tools: [{i:"🐍", n:"Python (scikit-learn, pandas, numpy, scipy)"}, {i:"📓", n:"Jupyter Lab / VS Code"}, {i:"🤖", n:"MLflow (tracking d'expériences)"}, {i:"📊", n:"Matplotlib / Plotly / Seaborn"}],
+    level: "Junior à Senior (0–8 ans)",
+    salary: "44–90k€", salaryNote: "Paris — junior (44–55k€) · confirmé (52–75k€) · senior (75–90k€) · Factoriel Q4 2025",
+    trend: 72,
+    market: "Rôle mature. Différenciation croissante avec le ML Engineer (plus orienté engineering/production). Les profils spécialisés GenAI bénéficient d'une prime salariale de +12% en 2025 (Factoriel).",
+    source: "Factoriel (Q4 2025), Licorne Society (mars 2026)"
+  },
+
+  'ml-engineer': {
+    title: "ML Engineer", branch: "Analyse & Science des Données", color: "#1a6b4a",
+    tags: ["Machine Learning", "Production", "Engineering"],
+    desc: "Le ML Engineer construit et optimise les modèles de machine learning avec une forte orientation software engineering. À mi-chemin entre Data Scientist et Software Engineer, il développe des modèles performants ET les met en production de façon robuste et scalable.",
+    skills: ["Python avancé orienté production (tests, refactoring, typing)", "Deep Learning (PyTorch, TensorFlow / Keras)", "Optimisation de modèles (quantification, pruning, distillation)", "APIs ML (FastAPI, gRPC)", "Software engineering (CI/CD, tests unitaires)", "Performance & scalabilité (distributed training, GPU)"],
+    tools: [{i:"🔥", n:"PyTorch / TensorFlow / JAX"}, {i:"🤗", n:"Hugging Face (Transformers, Datasets, PEFT)"}, {i:"⚡", n:"Ray / Distributed training (DeepSpeed, FSDP)"}, {i:"🐍", n:"FastAPI / Triton Inference Server (serving)"}],
+    level: "Confirmé / Senior (4–8 ans)",
+    salary: "48–95k€", salaryNote: "Paris — junior (48–58k€) · confirmé (65–80k€) · senior (80–95k€) · Licorne Society mars 2026",
+    trend: 83,
+    market: "Un des rôles les mieux rémunérés de l'écosystème. La frontière avec le Data Scientist s'accentue : le ML Engineer prime sur les projets à fort impact production.",
+    source: "Factoriel (Q4 2025), Licorne Society (mars 2026)"
+  },
+
+  'ai-engineer': {
+    title: "AI Engineer", branch: "Analyse & Science des Données", color: "#1a6b4a",
+    tags: ["IA", "Applications GenAI", "LinkedIn N°1 France 2026"],
+    desc: "L'AI Engineer développe des applications et systèmes intégrant de l'intelligence artificielle. En 2026, il se concentre principalement sur l'intégration de LLMs (GPT-4o, Claude, Gemini, Mistral) dans des produits réels via APIs, architectures RAG et agents autonomes.",
+    skills: ["Intégration de LLMs via API (OpenAI, Anthropic, Mistral, Cohere)", "Architectures RAG & knowledge bases vectorielles", "Agents IA autonomes (LangChain, CrewAI, AutoGen, LangGraph)", "Python niveau production (tests, typage, packaging)", "Évaluation et benchmarking de systèmes IA (RAGAS, DeepEval)", "Sécurité des systèmes IA (prompt injection, guardrails, PII)"],
+    tools: [{i:"🤖", n:"LangChain / LlamaIndex / LangGraph"}, {i:"🔍", n:"Vector DB (Pinecone, Weaviate, Chroma, Qdrant)"}, {i:"☁️", n:"OpenAI / Anthropic / Mistral / Cohere APIs"}, {i:"⚡", n:"FastAPI / Streamlit / Gradio (interfaces)"}],
+    level: "Confirmé / Senior (3–7 ans)",
+    salary: "60–120k€", salaryNote: "Paris · forte prime sur profils GenAI : +12% vs 2025 (Factoriel)",
+    trend: 97,
+    market: "N°1 des métiers en plus forte croissance en France (LinkedIn Jobs on the Rise 2026, taux de croissance >25% sur 2022-2025). Profil le plus recherché de l'écosystème data/IA en 2026.",
+    source: "LinkedIn France Jobs on the Rise 2026 (officiel), Factoriel (Q4 2025)"
+  },
+
+  'genai-engineer': {
+    title: "GenAI / Prompt Engineer", branch: "Analyse & Science des Données", color: "#1a6b4a",
+    tags: ["GenAI", "LLM", "Nouveau 2025", "Émergent"],
+    isNew: true,
+    desc: "Rôle émergent centré sur l'optimisation des interactions avec les LLMs en contexte de production. Le GenAI Engineer conçoit les architectures de prompts, évalue les outputs des modèles génératifs, orchestre les chaînes de traitement GenAI et développe des pipelines robustes pour les use cases produit.",
+    skills: ["Prompt engineering avancé (chain-of-thought, few-shot, constitutional AI)", "Évaluation de LLMs en production (RAGAS, DeepEval, benchmarks custom)", "Fine-tuning (LoRA, QLoRA, RLHF, DPO)", "Orchestration de chaînes de prompts et workflows GenAI", "Détection et mitigation des hallucinations", "Benchmarking comparatif de modèles (open source vs propriétaires)"],
+    tools: [{i:"🤖", n:"OpenAI API / Claude API / Mistral API / Gemini API"}, {i:"📋", n:"PromptLayer / LangSmith / Promptfoo"}, {i:"🤗", n:"Hugging Face (fine-tuning PEFT / LoRA)"}, {i:"📊", n:"RAGAS / DeepEval / TruLens (évaluation LLM)"}],
+    level: "Junior à Confirmé (1–5 ans)",
+    salary: "52–95k€", salaryNote: "Paris · le titre tend à évoluer vers 'AI Engineer' pour les profils seniors",
+    trend: 88,
+    market: "Rôle en cours de consolidation. Tend à se fondre dans l'AI Engineer pour les profils seniors. Point d'entrée attractif dans l'écosystème GenAI.",
+    source: "LinkedIn France Jobs on the Rise 2026, Factoriel (Q4 2025)"
+  }
+};
+
+/* ============================================================
+   SOURCES CATALOGUE — Liens officiels vérifiés
+   Dernière vérification : mars 2026
+   ============================================================ */
+const SOURCES_CATALOGUE = {
+
+  "Factoriel (Q4 2025)": {
+    name: "Factoriel — Baromètre des salaires Tech & Data",
+    badge: "pro",
+    badgeLabel: "Baromètre RH",
+    date: "Q4 2025 (oct.–déc. 2025)",
+    desc: "Baromètre salarial annuel basé sur les données réelles de paie de plus de 3 000 entreprises clientes en France. Données anonymisées, segmentées par poste, séniorité et région.",
+    coverage: "<strong>Données couvertes :</strong> Salaires bruts annuels fixes par poste data/tech, segmentation junior / confirmé / senior / expert, décote province vs Paris.",
+    url: "https://factorialhr.fr/blog/salaires-metiers-tech",
+    urlLabel: "Accéder au baromètre Factoriel"
+  },
+
+  "Licorne Society (mars 2026)": {
+    name: "Licorne Society — Étude salaires Tech France",
+    badge: "pro",
+    badgeLabel: "Étude sectorielle",
+    date: "Mars 2026 (édition annuelle)",
+    desc: "Étude salariale de référence sur les métiers tech et data en France, réalisée par Licorne Society auprès de milliers de professionnels du secteur. Focalisée sur les scale-ups et grandes entreprises tech françaises.",
+    coverage: "<strong>Données couvertes :</strong> Rémunérations data, tendances de recrutement, présence des rôles selon taille d'entreprise.",
+    url: "https://www.licorne.society/etude-salaires",
+    urlLabel: "Accéder à l'étude Licorne Society"
+  },
+
+  "LinkedIn France Jobs on the Rise 2026": {
+    name: "LinkedIn — Jobs on the Rise France 2026",
+    badge: "official",
+    badgeLabel: "Officiel LinkedIn",
+    date: "Janvier 2026 (publication annuelle officielle)",
+    desc: "Classement officiel de LinkedIn des métiers en plus forte croissance en France, établi à partir de l'analyse de millions d'offres d'emploi et de profils LinkedIn sur les 3 dernières années. Méthodologie publiquement documentée.",
+    coverage: "<strong>Données couvertes :</strong> Classement des 25 métiers en plus forte croissance en France, taux de croissance 2022–2025, compétences associées.",
+    url: "https://www.linkedin.com/pulse/jobs-on-the-rise-2026-france/",
+    urlLabel: "Consulter le rapport LinkedIn officiel"
+  },
+
+  "LinkedIn France Jobs Report 2026": {
+    name: "LinkedIn — Jobs on the Rise France 2026",
+    badge: "official",
+    badgeLabel: "Officiel LinkedIn",
+    date: "Janvier 2026",
+    desc: "Classement officiel LinkedIn des métiers en plus forte croissance en France, issu de l'analyse de millions d'offres et de profils sur 3 ans.",
+    coverage: "<strong>Données couvertes :</strong> Classements de croissance, compétences émergentes, tendances du marché de l'emploi tech/data.",
+    url: "https://www.linkedin.com/pulse/jobs-on-the-rise-2026-france/",
+    urlLabel: "Consulter le rapport LinkedIn officiel"
+  },
+
+  "LinkedIn France (2026)": {
+    name: "LinkedIn — Données marché de l'emploi France 2026",
+    badge: "official",
+    badgeLabel: "Officiel LinkedIn",
+    date: "2026",
+    desc: "Données issues des outils d'analyse du marché de l'emploi LinkedIn (LinkedIn Talent Insights) et du rapport Jobs on the Rise 2026.",
+    coverage: "<strong>Données couvertes :</strong> Tendances de recrutement, volumes d'offres, compétences recherchées.",
+    url: "https://www.linkedin.com/pulse/jobs-on-the-rise-2026-france/",
+    urlLabel: "Consulter LinkedIn Jobs on the Rise 2026"
+  },
+
+  "LinkedIn France Jobs on the Rise 2026 (officiel)": {
+    name: "LinkedIn — Jobs on the Rise France 2026",
+    badge: "official",
+    badgeLabel: "Officiel LinkedIn",
+    date: "Janvier 2026",
+    desc: "Classement officiel LinkedIn des métiers en plus forte croissance en France, issu de l'analyse de millions d'offres et profils sur 3 ans. Méthodologie publiquement documentée.",
+    coverage: "<strong>Données couvertes :</strong> Top 25 métiers en croissance, taux de croissance 2022–2025, compétences associées.",
+    url: "https://www.linkedin.com/pulse/jobs-on-the-rise-2026-france/",
+    urlLabel: "Consulter le rapport LinkedIn officiel"
+  },
+
+  "PwC AI Jobs Barometer 2025": {
+    name: "PwC — AI Jobs Barometer 2025",
+    badge: "research",
+    badgeLabel: "Étude internationale",
+    date: "2025",
+    desc: "Étude annuelle de PwC sur l'impact de l'IA sur le marché de l'emploi dans 27 pays, basée sur l'analyse de millions d'offres d'emploi. Publiée dans le cadre du Forum Économique Mondial de Davos.",
+    coverage: "<strong>Données couvertes :</strong> Taux d'adoption des rôles IA par secteur et pays, prime salariale liée à l'IA, croissance des postes CAIO.",
+    url: "https://www.pwc.com/gx/en/issues/artificial-intelligence/ai-jobs-barometer.html",
+    urlLabel: "Accéder au rapport PwC"
+  },
+
+  "Glassdoor France (janv. 2026)": {
+    name: "Glassdoor — Données salariales France",
+    badge: "pro",
+    badgeLabel: "Plateforme emploi",
+    date: "Janvier 2026",
+    desc: "Données salariales déclaratives anonymisées collectées auprès de professionnels en poste en France. Glassdoor agrège les salaires déclarés volontairement par les employés.",
+    coverage: "<strong>Données couvertes :</strong> Fourchettes salariales brutes annuelles par intitulé de poste et localisation. Données déclaratives — à croiser avec d'autres sources.",
+    url: "https://www.glassdoor.fr/Salaires/index.htm",
+    urlLabel: "Consulter Glassdoor France"
+  },
+
+  "Glassdoor France (2025)": {
+    name: "Glassdoor — Données salariales France",
+    badge: "pro",
+    badgeLabel: "Plateforme emploi",
+    date: "2025",
+    desc: "Données salariales déclaratives anonymisées collectées auprès de professionnels en poste en France.",
+    coverage: "<strong>Données couvertes :</strong> Fourchettes salariales par poste et localisation. Données déclaratives — à croiser avec d'autres sources.",
+    url: "https://www.glassdoor.fr/Salaires/index.htm",
+    urlLabel: "Consulter Glassdoor France"
+  },
+
+  "Glassdoor France": {
+    name: "Glassdoor — Données salariales France",
+    badge: "pro",
+    badgeLabel: "Plateforme emploi",
+    date: "2025–2026",
+    desc: "Données salariales déclaratives anonymisées collectées auprès de professionnels en poste en France.",
+    coverage: "<strong>Données couvertes :</strong> Fourchettes salariales par poste et localisation. Données déclaratives — à croiser avec d'autres sources.",
+    url: "https://www.glassdoor.fr/Salaires/index.htm",
+    urlLabel: "Consulter Glassdoor France"
+  },
+
+  "Apec (2025)": {
+    name: "Apec — Baromètre et études des cadres",
+    badge: "official",
+    badgeLabel: "Institution française",
+    date: "2025",
+    desc: "L'Apec (Association Pour l'Emploi des Cadres) publie des baromètres et études sur le marché de l'emploi cadre en France, basés sur des enquêtes auprès d'employeurs et de cadres.",
+    coverage: "<strong>Données couvertes :</strong> Tendances de recrutement cadres, rémunérations, évolutions par fonction et secteur.",
+    url: "https://corporate.apec.fr/home/nos-etudes.html",
+    urlLabel: "Accéder aux études Apec"
+  },
+
+  "Apec": {
+    name: "Apec — Baromètre et études des cadres",
+    badge: "official",
+    badgeLabel: "Institution française",
+    date: "2025",
+    desc: "L'Apec publie des baromètres et études sur le marché de l'emploi cadre en France.",
+    coverage: "<strong>Données couvertes :</strong> Tendances de recrutement, rémunérations cadres, évolutions par fonction.",
+    url: "https://corporate.apec.fr/home/nos-etudes.html",
+    urlLabel: "Accéder aux études Apec"
+  },
+
+  "Règlement UE 2024/1689 (JOUE L 2024/1689)": {
+    name: "Règlement UE 2024/1689 — EU AI Act (texte officiel)",
+    badge: "regulation",
+    badgeLabel: "Texte réglementaire officiel",
+    date: "Publié au JOUE le 12 juillet 2024 — Entrée en vigueur le 1er août 2024",
+    desc: "Texte officiel du Règlement européen sur l'intelligence artificielle (EU AI Act), publié au Journal Officiel de l'Union Européenne. Calendrier d'application progressive : interdictions (fév. 2025), GPAI (août 2025), systèmes haut risque (août 2026).",
+    coverage: "<strong>Données couvertes :</strong> Classification des risques IA, obligations légales par catégorie, calendrier d'application, sanctions (jusqu'à 35M€ ou 7% CA mondial).",
+    url: "https://eur-lex.europa.eu/legal-content/FR/TXT/?uri=CELEX:32024R1689",
+    urlLabel: "Lire le texte officiel sur EUR-Lex"
+  },
+
+  "CNIL.fr": {
+    name: "CNIL — Commission Nationale Informatique et Libertés",
+    badge: "regulation",
+    badgeLabel: "Autorité de contrôle française",
+    date: "Référence permanente — mis à jour en continu",
+    desc: "La CNIL est l'autorité française de contrôle en matière de protection des données personnelles (RGPD). Son site publie les lignes directrices, délibérations, sanctions et guides pratiques faisant autorité.",
+    coverage: "<strong>Données couvertes :</strong> Obligations RGPD, rôle et missions du DPO (Art. 37-39 RGPD), AIPD/DPIA, droits des personnes.",
+    url: "https://www.cnil.fr/fr/le-delegue-a-la-protection-des-donnees-dpo",
+    urlLabel: "Fiche DPO officielle — CNIL"
+  },
+
+  "Règlement UE 2016/679 (RGPD)": {
+    name: "Règlement UE 2016/679 — RGPD (texte officiel)",
+    badge: "regulation",
+    badgeLabel: "Texte réglementaire officiel",
+    date: "Applicable depuis le 25 mai 2018",
+    desc: "Texte officiel du Règlement Général sur la Protection des Données, publié au Journal Officiel de l'Union Européenne. Référence légale absolue pour tout ce qui concerne la protection des données personnelles en Europe.",
+    coverage: "<strong>Données couvertes :</strong> Obligations des responsables de traitement, rôle du DPO (Art. 37-39), droits des personnes (Art. 15-22), sanctions (jusqu'à 20M€ ou 4% CA).",
+    url: "https://eur-lex.europa.eu/legal-content/FR/TXT/?uri=CELEX:32016R0679",
+    urlLabel: "Lire le RGPD sur EUR-Lex"
+  },
+
+  "Clementine.jobs (2025)": {
+    name: "Clementine.jobs — Étude salaires DPO & juridique",
+    badge: "pro",
+    badgeLabel: "Cabinet spécialisé",
+    date: "2025",
+    desc: "Cabinet de recrutement spécialisé dans les profils juridiques et conformité (DPO, juristes, compliance officers). Publie des études salariales annuelles sur ces métiers en France.",
+    coverage: "<strong>Données couvertes :</strong> Rémunérations DPO par taille d'entreprise et secteur, tendances de recrutement conformité/juridique.",
+    url: "https://www.clementine.jobs/guide-salaires/",
+    urlLabel: "Accéder au guide salaires Clementine"
+  },
+
+  "Welcome to the Jungle (2025)": {
+    name: "Welcome to the Jungle — Tendances marché",
+    badge: "pro",
+    badgeLabel: "Plateforme emploi",
+    date: "2025",
+    desc: "Plateforme de recrutement tech française analysant les tendances du marché de l'emploi à partir des offres publiées sur sa plateforme et d'enquêtes auprès de candidats et recruteurs.",
+    coverage: "<strong>Données couvertes :</strong> Tendances recrutement tech/data, profils recherchés, attractivité des postes.",
+    url: "https://www.welcometothejungle.com/fr/articles/category/metiers",
+    urlLabel: "Explorer les tendances Welcome to the Jungle"
+  },
+
+  "McKinsey Global Institute": {
+    name: "McKinsey Global Institute — The Data-Driven Enterprise",
+    badge: "research",
+    badgeLabel: "Étude internationale",
+    date: "2022–2024 (études successives)",
+    desc: "Le McKinsey Global Institute a publié plusieurs études de référence sur les métiers émergents liés à la data, dont la définition et la valorisation du rôle de 'Data Translator'.",
+    coverage: "<strong>Données couvertes :</strong> Émergence et définition du rôle Data Translator, valorisation économique de la médiation data/métier.",
+    url: "https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights",
+    urlLabel: "Études McKinsey Digital"
+  }
+};
+
+/* Résoudre les alias pour matcher les sources dans les fiches */
+function resolveSourceKeys(sourceStr) {
+  const keys = sourceStr.split(/,\s*(?=[A-Z])/);
+  return keys.map(k => k.trim()).filter(k => {
+    // Cherche une correspondance exacte ou partielle dans le catalogue
+    return Object.keys(SOURCES_CATALOGUE).some(cat =>
+      k.includes(cat) || cat.includes(k) || k === cat
+    );
+  }).map(k => {
+    const exact = SOURCES_CATALOGUE[k];
+    if (exact) return k;
+    // Trouver la meilleure correspondance partielle
+    return Object.keys(SOURCES_CATALOGUE).find(cat =>
+      k.includes(cat) || cat.includes(k)
+    ) || k;
+  }).filter((v, i, a) => a.indexOf(v) === i); // dédupliquer
+}
+
+function buildSourceCard(key) {
+  const s = SOURCES_CATALOGUE[key];
+  if (!s) return '';
+  return `
+    <div class="source-card">
+      <div class="source-card-header">
+        <span class="source-badge ${s.badge}">${s.badgeLabel}</span>
+        <span class="source-name">${s.name}</span>
+        <span class="source-date">${s.date}</span>
+      </div>
+      <div class="source-card-body">
+        <div class="source-desc">${s.desc}</div>
+        <div class="source-coverage">${s.coverage}</div>
+        <a class="source-link" href="${s.url}" target="_blank" rel="noopener noreferrer">
+          <span class="source-link-icon">↗</span>${s.urlLabel}
+        </a>
+      </div>
+    </div>`;
+}
+
+function showSources(jobTitle, sourceStr) {
+  const overlay = document.getElementById('sourcesOverlay');
+  const title   = document.getElementById('sourcesModalTitle');
+  const body    = document.getElementById('sourcesModalBody');
+
+  title.textContent = jobTitle + ' — Sources';
+
+  const keys = resolveSourceKeys(sourceStr);
+  const cards = keys.map(buildSourceCard).filter(Boolean).join('');
+
+  const disclaimer = `<div class="sources-disclaimer">
+    <strong>Avertissement :</strong> Les données salariales et de tendances sont issues de sources tierces et reflètent l'état du marché à leur date de publication. Elles peuvent varier selon le secteur, la taille de l'entreprise et le profil individuel. La vérification directe sur les sources officielles listées ci-dessous est recommandée avant toute décision.
+  </div>`;
+
+  body.innerHTML = disclaimer + (cards || `<p style="font-size:13px;color:var(--color-text-alt);font-style:italic">Aucune source référencée trouvée dans le catalogue pour : ${sourceStr}</p>`);
+  overlay.classList.add('visible');
+}
+
+function closeSourcesModal(e) {
+  if (e.target === document.getElementById('sourcesOverlay'))
+    document.getElementById('sourcesOverlay').classList.remove('visible');
+}
+function closeSourcesModalDirect() {
+  document.getElementById('sourcesOverlay').classList.remove('visible');
+}
+
+/* Mettre à jour le listener Escape pour inclure la modale sources */
+const careerCache = {};
+
+async function showCareerPath(jobTitle, branch, level) {
+  const overlay = document.getElementById('careerOverlay');
+  const title   = document.getElementById('careerModalTitle');
+  const body    = document.getElementById('careerModalBody');
+
+  title.textContent = jobTitle;
+  body.innerHTML = `<div class="career-loading"><div class="career-spinner"></div><span>Chargement du parcours…</span></div>`;
+  overlay.classList.add('visible');
+
+  const cacheKey = jobTitle;
+  if (careerCache[cacheKey]) {
+    renderCareerText(body, careerCache[cacheKey]);
+    return;
+  }
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: `Tu es un expert RH et carrières dans les métiers de la Data et de l'IA en France, en 2026.
+Quand on te demande le parcours d'accès à un métier data, tu réponds de façon structurée, factuelle et vérifiable.
+Règles strictes :
+- Tu décris les étapes de carrière typiques SANS citer de noms précis de postes ou de titres de métiers (pas de "Data Analyst", "ML Engineer", etc.) — décris les fonctions et responsabilités à la place
+- Tu mentionnes les formations initiales les plus fréquentes (types de diplômes, domaines d'études) sans nommer d'écoles précises
+- Tu indiques les durées typiques à chaque étape
+- Tu mentionnes 2-3 chemins alternatifs possibles (reconversion, parcours atypiques)
+- 4-6 phrases maximum, ton factuel
+- Réponds uniquement en français, sans markdown, sans bullet points, en prose fluide`,
+        messages: [{
+          role: "user",
+          content: `Décris le parcours d'accès typique au métier suivant en France en 2026, en respectant strictement les règles de format : "${jobTitle}" (branche : ${branch}, niveau : ${level})`
+        }]
+      })
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    const text = data.content?.map(b => b.text || '').join('') || '';
+    if (!text) throw new Error('Réponse vide');
+
+    careerCache[cacheKey] = text;
+    renderCareerText(body, text);
+
+  } catch (err) {
+    body.innerHTML = `<p style="font-size:13px;color:var(--color-not-acquired);font-style:italic">
+      Impossible de charger le parcours. Vérifiez votre connexion.<br>
+      <small style="opacity:0.7">${err.message}</small>
+    </p>`;
+  }
+}
+
+function renderCareerText(container, text) {
+  const paras = text.split(/\n\n+/).filter(Boolean);
+  container.innerHTML = `<div class="career-modal-text">${paras.map(p => `<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}</div>`;
+}
+
+function closeCareerModal(e) {
+  if (e.target === document.getElementById('careerOverlay')) {
+    document.getElementById('careerOverlay').classList.remove('visible');
+  }
+}
+
+function closeCareerModalDirect() {
+  document.getElementById('careerOverlay').classList.remove('visible');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('careerOverlay').classList.remove('visible');
+    document.getElementById('skillOverlay').classList.remove('visible');
+    document.getElementById('sourcesOverlay').classList.remove('visible');
+  }
+});
+const skillCache = {};
+
+async function showSkillTooltip(skill, branch) {
+  const overlay  = document.getElementById('skillOverlay');
+  const title    = document.getElementById('skillTooltipTitle');
+  const body     = document.getElementById('skillTooltipBody');
+  const footer   = document.getElementById('skillTooltipFooter');
+
+  title.textContent = skill;
+  footer.textContent = 'Définition générée par IA · Contexte : métiers de la Data 2026';
+
+  // Show overlay immediately with spinner
+  body.innerHTML = `<div class="skill-tooltip-loading"><div class="skill-spinner"></div><span>Chargement de la définition…</span></div>`;
+  overlay.classList.add('visible');
+
+  // Cache hit
+  if (skillCache[skill]) {
+    renderSkillText(body, skillCache[skill]);
+    return;
+  }
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: `Tu es un expert des métiers de la Data et de l'IA, pédagogue et précis. 
+Quand on te demande la définition d'une compétence dans le contexte des métiers de la data, tu réponds en 3-5 phrases claires et concrètes :
+1. Ce qu'est la compétence (définition précise)
+2. Pourquoi elle est utile dans ce contexte métier
+3. Un exemple concret d'application si pertinent
+Tu réponds uniquement en français, sans introduction ni mise en forme markdown. Sois factuel, précis et accessible.`,
+        messages: [{
+          role: "user",
+          content: `Donne-moi la définition détaillée de cette compétence dans le contexte des métiers de la Data et de l'IA en 2026 (branche : ${branch}) : "${skill}"`
+        }]
+      })
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    const text = data.content?.map(b => b.text || '').join('') || '';
+
+    if (!text) throw new Error('Réponse vide');
+
+    skillCache[skill] = text;
+    renderSkillText(body, text);
+
+  } catch (err) {
+    body.innerHTML = `<p class="skill-tooltip-error">
+      Impossible de charger la définition. Vérifiez votre connexion et réessayez.<br>
+      <small style="opacity:0.7">${err.message}</small>
+    </p>`;
+    footer.textContent = 'Erreur de chargement';
+  }
+}
+
+function renderSkillText(container, text) {
+  container.innerHTML = `<div class="skill-tooltip-text">${text.replace(/\n\n/g, '</p><p style="margin-top:10px">').replace(/\n/g, '<br>')}</div>`;
+}
+
+function closeSkillTooltip(e) {
+  // Only close if clicking the overlay background, not the tooltip itself
+  if (e.target === document.getElementById('skillOverlay')) {
+    document.getElementById('skillOverlay').classList.remove('visible');
+  }
+}
+
+function closeSkillTooltipDirect() {
+  document.getElementById('skillOverlay').classList.remove('visible');
+}
+
+let currentActive = null;
+
+function showPanel(id) {
+  const d = DATA[id];
+  if (!d) return;
+
+  document.querySelectorAll('.metier.active').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.metier').forEach(el => {
+    if (el.getAttribute('onclick') === `showPanel('${id}')`) el.classList.add('active');
+  });
+  currentActive = id;
+
+  const tagHtml = d.tags.map(t => {
+    const isNew = t.toLowerCase().includes('nouveau') || t.toLowerCase().includes('new') || t.toLowerCase().includes('émergent');
+    return `<span class="panel-tag${isNew ? ' tag-new' : ''}">${t}</span>`;
+  }).join('');
+
+  document.getElementById('panelTop').innerHTML = `
+    <button class="panel-close-top" onclick="closePanel()">✕</button>
+    <div class="panel-branch-label">${d.branch}</div>
+    <div class="panel-title">${d.title}</div>
+    <div class="panel-tags">${tagHtml}</div>
+  `;
+
+  const skillsHtml = d.skills.map(s => `<div class="skill-chip" onclick="showSkillTooltip('${s.replace(/'/g, "\\'")}', '${d.branch}')" title="Cliquez pour la définition"><span class="skill-icon">ℹ</span>${s}</div>`).join('');
+  const toolsHtml  = d.tools.map(t => `<div class="tool-item"><span class="tool-icon">${t.i}</span>${t.n}</div>`).join('');
+
+  document.getElementById('panelBody').innerHTML = `
+    <div class="panel-section">
+      <h4>Description du rôle</h4>
+      <p class="panel-desc">${d.desc}</p>
+    </div>
+    <div class="panel-section">
+      <h4>Compétences clés</h4>
+      <div class="skills-grid">${skillsHtml}</div>
+    </div>
+    <div class="panel-section">
+      <h4>Outils & Technologies</h4>
+      <div class="tools-list">${toolsHtml}</div>
+    </div>
+    <div class="panel-section">
+      <h4>Informations clés</h4>
+      <div class="info-grid">
+        <div class="info-card career-card" onclick="showCareerPath('${d.title}', '${d.branch}', '${d.level.replace(/'/g, "\\'")}')">
+          <div class="label">Niveau requis</div>
+          <div class="value" style="font-size:12px">${d.level}</div>
+          <div class="career-hint">↗ Voir le parcours d'accès</div>
+        </div>
+        <div class="info-card">
+          <div class="label">Indice de dynamisme</div>
+          <div class="value accent">${d.trend} / 100</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-section">
+      <h4>Rémunération (France)</h4>
+      <div class="salary-block">
+        <div class="salary-label">Fourchette brut annuel fixe · CDI · Paris</div>
+        <div class="salary-val">${d.salary}</div>
+        <div class="salary-note">${d.salaryNote}</div>
+      </div>
+      <div class="source-note">Source : ${d.source}</div>
+    </div>
+    <div class="panel-section">
+      <h4>Tendance marché 2026</h4>
+      <div class="trend-label">
+        <span>Dynamisme du recrutement</span>
+        <span class="trend-val">${d.trend} / 100</span>
+      </div>
+      <div class="trend-bar">
+        <div class="trend-fill" data-width="${d.trend}"></div>
+      </div>
+      <div class="market-note">${d.market}</div>
+      <div class="source-note">Source : ${d.source}</div>
+    </div>
+    <div class="panel-section">
+      <h4>Transparence des données</h4>
+      <button class="sources-btn" onclick="showSources('${d.title.replace(/'/g, "\\'")}', '${d.source.replace(/'/g, "\\'")}')">
+        <span class="sources-btn-icon">📋</span>
+        <span class="sources-btn-text">Consulter les sources & liens officiels</span>
+        <span class="sources-btn-arrow">↗</span>
+      </button>
+    </div>
+  `;
+
+  document.getElementById('sidePanel').classList.add('open');
+  document.getElementById('mapArea').classList.add('panel-open');
+
+  setTimeout(() => {
+    document.querySelectorAll('.trend-fill').forEach(el => {
+      el.style.width = el.dataset.width + '%';
+    });
+  }, 60);
+}
+
+function closePanel() {
+  document.getElementById('sidePanel').classList.remove('open');
+  document.getElementById('mapArea').classList.remove('panel-open');
+  document.querySelectorAll('.metier.active').forEach(el => el.classList.remove('active'));
+  currentActive = null;
+}
+</script>
+<footer class="page-footer">
+  <div class="footer-left">
+    <div class="footer-claude-mark">✦</div>
+    <div class="footer-credit">
+      Carte heuristique initiale générée par <strong>Gemini</strong> (<a href="https://deepmind.google" target="_blank" rel="noopener">Google DeepMind</a>)
+      · Structure, données, développement et rédaction par <strong>Claude</strong> (<a href="https://www.anthropic.com" target="_blank" rel="noopener">Anthropic</a>)
+      · Projet collaboratif humain–IA
+    </div>
+  </div>
+  <div class="footer-right">
+    Discolab-G · Édition mars 2026
+  </div>
+</footer>
+
+</body>
+</html>
