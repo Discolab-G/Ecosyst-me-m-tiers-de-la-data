@@ -1451,60 +1451,491 @@ function closeSourcesModalDirect() {
 }
 
 /* Mettre à jour le listener Escape pour inclure la modale sources */
-const careerCache = {};
 
-async function showCareerPath(jobTitle, branch, level) {
+/* ============================================================
+   CONTENU STATIQUE — Définitions des compétences & Parcours de carrière
+   Pré-généré pour la version publique GitHub Pages (sans appel API)
+   
+   Sources utilisées pour la rédaction :
+   - Référentiels métiers : DAMA-DMBOK v2 (2017), DCAM (EDM Council), TOGAF 10
+   - Réglementaire : Règlement UE 2024/1689 (EU AI Act), Règlement UE 2016/679 (RGPD)
+   - Frameworks IA/ML : Google ML Practitioners Guide, AWS Well-Architected ML Lens
+   - Certifications de référence : AWS, GCP, Azure, Databricks, dbt, Kubernetes (CNCF)
+   - Marché : LinkedIn Jobs on the Rise 2026, Factoriel Q4 2025, Licorne Society mars 2026
+   Dernière mise à jour : mars 2026
+   ============================================================ */
+
+const SKILL_DEFINITIONS = {
+
+  /* ── STRATÉGIE & LEADERSHIP ── */
+  "Stratégie d'entreprise": "Capacité à aligner les initiatives data avec les objectifs business à long terme de l'organisation. Elle comprend la lecture des dynamiques concurrentielles, la définition de priorités d'investissement et la communication de la valeur data au Comité de Direction. Concrètement, un CDO l'utilise pour arbitrer entre plusieurs projets data en fonction de leur potentiel de création de valeur mesuré.",
+
+  "Gouvernance de la donnée": "Ensemble des règles, processus, rôles et responsabilités qui encadrent la gestion des données dans une organisation, tel que défini par le référentiel DAMA-DMBOK v2. Elle couvre la propriété des données, les standards de qualité, les politiques d'accès et la traçabilité. Sans gouvernance formalisée, les organisations accumulent de la dette technique data et peinent à se conformer au RGPD.",
+
+  "Leadership & change management": "Capacité à faire évoluer les comportements et les pratiques d'une organisation autour de la data. Le change management en data implique de dépasser les résistances culturelles ('les données appartiennent à mon département'), de former les équipes et d'instaurer une culture data-driven. Les modèles de référence incluent ADKAR (Prosci) et Kotter's 8-Step Model.",
+
+  "Data monetization": "Processus de création de valeur économique à partir des actifs data d'une organisation, soit en interne (amélioration des décisions, réduction des coûts), soit en externe (vente de données agrégées, data-as-a-service). Le cadre Gartner distingue trois niveaux : amélioration des processus internes, vente de produits data enrichis, et création de nouveaux modèles d'affaires data-native.",
+
+  "Communication C-Level": "Aptitude à traduire des enjeux techniques complexes en langage business compréhensible par des dirigeants non-techniques (PDG, DAF, DRH). Elle implique de structurer un message autour de la valeur business, du risque et du ROI, et non autour des détails technologiques. Indispensable pour obtenir des budgets et arbitrages favorables aux projets data.",
+
+  "Gestion budgétaire": "Capacité à construire, défendre et piloter un budget data pluriannuel incluant les coûts d'infrastructure cloud, de licences logicielles, de ressources humaines et de formation. Dans le contexte data, elle intègre la gestion des coûts variables (consommation cloud, APIs) et la justification du ROI des investissements data auprès du DAF.",
+
+  "Analytics avancé": "Utilisation de méthodes statistiques et computationnelles sophistiquées pour extraire des insights non-évidents des données : modélisation prédictive, machine learning, analyse de séries temporelles, clustering. Va au-delà du reporting descriptif pour produire des analyses prospectives qui guident les décisions stratégiques.",
+
+  "Modélisation statistique": "Construction de modèles mathématiques représentant des phénomènes réels à partir de données observées : régression linéaire/logistique, modèles à effets mixtes, séries temporelles (ARIMA, SARIMA), modèles bayésiens. La maîtrise des hypothèses sous-jacentes (normalité, homoscédasticité, indépendance) est indispensable pour produire des résultats fiables.",
+
+  "Leadership analytique": "Capacité à définir la vision analytique d'une organisation, à constituer et faire grandir des équipes d'analyse performantes, et à instiller une culture de la décision basée sur les données. Implique de définir les KPIs clés de l'entreprise, de choisir les outils analytiques stratégiques et d'évangéliser les pratiques data-driven auprès des directions métier.",
+
+  "Communication exécutive": "Art de synthétiser des analyses complexes en recommandations actionnables pour des décideurs disposant de peu de temps. Inclut la maîtrise de la structure Pyramide de Minto (conclusion d'abord, arguments ensuite), la création de dashboards exécutifs lisibles en 30 secondes, et la capacité à répondre aux objections de dirigeants sceptiques.",
+
+  "Mesure du ROI": "Quantification du retour sur investissement des initiatives data : réduction des coûts opérationnels, augmentation des revenus, amélioration de la qualité des décisions. Nécessite de définir des métriques baseline avant le projet, des mécanismes de mesure post-déploiement, et de distinguer la causalité de la corrélation dans l'attribution des résultats.",
+
+  "Gestion d'équipes data": "Management de profils techniques hautement spécialisés et autonomes : ingénieurs, data scientists, analystes. Implique de créer des conditions de travail attractives (stack technique moderne, projets stimulants), de gérer les trajectoires de carrière dans un marché sous tension, et de maintenir la cohésion d'équipes souvent distribuées et hybrides.",
+
+  /* ── STRATÉGIE IA & PRODUCT ── */
+  "Stratégie IA & GenAI": "Définition d'une feuille de route pour l'adoption de l'intelligence artificielle — notamment des LLMs et de la GenAI — dans une organisation. Couvre l'identification des use cases à fort ROI, le choix entre modèles propriétaires (GPT-4o, Claude) et open source (Mistral, Llama), la gestion des risques réglementaires (EU AI Act) et l'organisation des équipes IA.",
+
+  "Règlement UE 2024/1689 (EU AI Act) — application progressive": "Connaissance opérationnelle du Règlement européen sur l'IA (JOUE L 2024/1689), en vigueur depuis le 1er août 2024 avec application progressive. Comprend la classification des systèmes IA par niveau de risque (inacceptable, haut, limité, minimal), les obligations documentaires des fournisseurs et déployeurs, et le calendrier : interdictions (fév. 2025), GPAI (août 2025), systèmes haut risque (août 2026).",
+
+  "Gestion de portefeuille IA": "Pilotage de l'ensemble des initiatives IA d'une organisation comme un portefeuille d'investissements : priorisation par ROI et risque, allocation des ressources (GPU, data scientists), gouvernance des projets, mesure de la valeur délivrée. S'appuie sur les frameworks PMO adaptés aux spécificités de l'IA (incertitude des résultats, dépendance aux données).",
+
+  "Leadership tech": "Capacité à orienter des choix technologiques structurants (architectures, plateformes, build vs buy) en combinant vision stratégique et compréhension technique. Pour un CAIO, cela implique de choisir les plateformes LLM, les infrastructures MLOps et les outils GenAI qui constitueront la colonne vertébrale IA de l'entreprise pour les 3-5 prochaines années.",
+
+  "Change management": "Application de méthodes structurées pour accompagner les individus et les organisations dans la transition vers de nouvelles pratiques data/IA. Inclut la gestion des résistances, la formation, la communication et la création d'ambassadeurs internes. Dans le contexte GenAI, c'est un enjeu critique pour éviter que les outils IA ne soient adoptés de façon chaotique et non gouvernée.",
+
+  "Éthique de l'IA": "Capacité à identifier et traiter les dimensions éthiques des systèmes IA : biais algorithmiques, équité des décisions automatisées, transparence ('droit à l'explication' du RGPD Art. 22), impact sur l'emploi, confidentialité. S'appuie sur des référentiels comme les Lignes directrices de l'UE pour une IA digne de confiance (2019) et les principes OCDE sur l'IA.",
+
+  "Product management": "Application de la discipline produit aux solutions data : définition du problème utilisateur, priorisation du backlog par valeur, construction de roadmaps, mesure de l'adoption. En contexte data, cela implique de traiter un dataset ou un pipeline comme un produit avec des utilisateurs, des SLA et des métriques d'usage.",
+
+  "Agile / Scrum": "Cadre de développement itératif appliqué aux projets data : sprints de 2 semaines, backlog priorisé, définitions of done, rétrospectives. La particularité en data est de gérer l'incertitude inhérente aux projets analytiques (un modèle peut ne pas performer) dans un cadre Agile conçu initialement pour le développement logiciel.",
+
+  "Priorisation backlog": "Technique de classement des fonctionnalités et tâches data par valeur business divisée par effort technique. Les frameworks RICE (Reach, Impact, Confidence, Effort) et MoSCoW sont courants. En contexte data/IA, intègre aussi la faisabilité technique (disponibilité des données, qualité) comme critère de priorisation.",
+
+  "User research": "Méthodes d'investigation des besoins réels des utilisateurs finaux d'un produit data : interviews, observations, tests utilisateurs, analyse des comportements. Évite de construire des dashboards ou des modèles qui répondent à la mauvaise question. Essentiel pour un Data Product Manager qui doit valider l'utilité de ses livrables avant de les développer.",
+
+  "Métriques produit": "Définition et suivi des indicateurs de succès d'un produit data : taux d'adoption, fréquence d'utilisation, NPS, temps gagné par l'utilisateur, impact business mesurable. Distingue les vanity metrics (vues, clics) des actionable metrics qui reflètent réellement la valeur créée.",
+
+  "Collaboration cross-fonctionnelle": "Aptitude à travailler efficacement avec des interlocuteurs de cultures et d'expertises très différentes : ingénieurs, analystes, juristes, métiers, dirigeants. En data, implique de naviguer entre les contraintes techniques, les besoins métier et les exigences réglementaires en maintenant la cohésion du projet.",
+
+  "Fondamentaux ML": "Compréhension des mécanismes de base du machine learning sans nécessairement savoir les implémenter : différence supervised/unsupervised/reinforcement learning, notion de biais-variance trade-off, surapprentissage (overfitting), validation croisée, métriques d'évaluation (précision, rappel, AUC-ROC). Indispensable pour un Product Manager qui doit comprendre les contraintes et limites d'un modèle ML.",
+
+  "Évaluation de modèles": "Mesure objective des performances d'un modèle ML sur des données non vues pendant l'entraînement. Comprend le choix des métriques adaptées au problème (F1-score pour les problèmes déséquilibrés, RMSE pour la régression), la détection du data leakage, et l'évaluation de la robustesse (performance sur différents sous-groupes de population).",
+
+  "Éthique IA": "Application pratique des principes éthiques dans le développement de produits IA : détection des biais dans les datasets d'entraînement, analyse d'impact sur les populations défavorisées, documentation transparente des limites du modèle. En contexte product, implique d'intégrer une évaluation éthique systématique dans le processus de validation avant mise en production.",
+
+  "Communication technique": "Capacité à expliquer des concepts techniques complexes (architecture d'un modèle, limitation d'un algorithme, dette technique data) à des interlocuteurs non-techniques de façon précise et sans condescendance. Inclut la rédaction de spécifications fonctionnelles, la tenue de réunions d'alignement et la création de documentation accessible.",
+
+  "Gestion du risque IA": "Identification, évaluation et mitigation des risques spécifiques aux systèmes IA : hallucinations des LLMs, biais de sélection, drift des modèles en production, attaques adversariales, non-conformité réglementaire (EU AI Act). S'appuie sur le NIST AI Risk Management Framework (AI RMF 1.0, 2023) comme référentiel de bonnes pratiques.",
+
+  /* ── GOUVERNANCE & QUALITÉ ── */
+  "Frameworks DAMA / DCAM": "Référentiels de gestion des données de référence. DAMA-DMBOK v2 (Data Management Body of Knowledge) définit 11 domaines de gestion des données (gouvernance, qualité, architecture, sécurité, etc.). DCAM (Data Capability Assessment Model, EDM Council) évalue la maturité data d'une organisation sur une échelle de 1 à 5. Utilisés pour structurer et évaluer les programmes de gouvernance.",
+
+  "Catalogues de données": "Outils centralisant les métadonnées (descriptions, propriétaires, lignage, qualité) de tous les assets data d'une organisation. Permettent aux utilisateurs de découvrir, comprendre et faire confiance aux données disponibles. Les leaders du marché incluent Collibra, Alation, Atlan et l'open source OpenMetadata. Indispensables pour le self-service data et la conformité RGPD.",
+
+  "Conformité réglementaire": "Vérification et maintien du respect des obligations légales applicables aux données : RGPD (Règlement UE 2016/679), EU AI Act (Règlement UE 2024/1689), directives sectorielles (DORA pour la finance, HDS pour la santé). Implique une veille réglementaire continue, des audits périodiques et la mise en place de contrôles techniques et organisationnels.",
+
+  "Animation de comités data": "Organisation et facilitation de comités de gouvernance data : Data Governance Council, Data Stewardship Committee. Inclut la définition des ordres du jour, la gestion des décisions et des escalades, le suivi des actions et la communication des décisions à l'ensemble de l'organisation. Compétence clé pour maintenir l'engagement des parties prenantes dans la durée.",
+
+  "Data lineage": "Traçabilité complète du cycle de vie d'une donnée : de sa source d'origine à sa consommation finale, en passant par toutes les transformations intermédiaires. Indispensable pour l'analyse d'impact (qu'est-ce qui serait affecté si cette source change ?), le débogage des anomalies et la conformité réglementaire (RGPD Art. 30 — registre des traitements). Outils : OpenLineage, Marquez, Atlan.",
+
+  "Connaissance métier approfondie": "Expertise d'un domaine fonctionnel spécifique (finance, RH, marketing, supply chain) qui permet de contextualiser les données, d'identifier les anomalies et de définir des règles de qualité pertinentes. Un Data Steward finance comprend que 'solde négatif' est une anomalie dans le compte clients mais normal dans le compte découvert.",
+
+  "Qualité des données": "Ensemble des pratiques visant à maintenir les données à un niveau de qualité suffisant pour leur usage prévu, selon 6 dimensions DAMA : complétude, exactitude, cohérence, unicité, actualité, validité. Inclut le data profiling, la définition de seuils de qualité acceptables, et la mise en place de processus de remédiation.",
+
+  "Documentation": "Production et maintenance de documents décrivant les données, les processus et les systèmes : dictionnaires de données, schémas, règles de gestion, politiques. En contexte data, la documentation est souvent négligée mais constitue un actif critique pour la continuité opérationnelle, l'onboarding et la conformité RGPD.",
+
+  "Résolution de conflits data": "Médiation entre parties prenantes ayant des définitions ou des besoins contradictoires sur une même donnée (ex: deux départements qui calculent le 'chiffre d'affaires' différemment). Implique des compétences de négociation, la capacité à documenter les compromis acceptés et à faire valider une définition unique par les bonnes instances de gouvernance.",
+
+  "Catalogage": "Processus d'inventaire et de description des assets data d'une organisation dans un catalogue centralisé : identification des sources, documentation des métadonnées techniques et métier, classification par sensibilité, attribution des propriétaires. Première étape de tout programme de gouvernance des données.",
+
+  "SQL de base": "Maîtrise des requêtes SQL fondamentales pour interroger une base de données relationnelle : SELECT, WHERE, GROUP BY, JOIN (INNER, LEFT, RIGHT). Permet à un Data Steward ou Business Analyst de vérifier la qualité des données, d'extraire des échantillons et de valider des règles de gestion sans dépendre d'un technicien.",
+
+  "Métriques qualité data (DAMA)": "Indicateurs de mesure de la qualité des données selon le référentiel DAMA-DMBOK : taux de complétude (% de valeurs non nulles), taux d'exactitude (% de valeurs conformes à la réalité), taux d'unicité (% d'enregistrements sans doublon), taux de validité (% de valeurs respectant les règles de format). Permettent de piloter l'amélioration continue.",
+
+  "Data profiling": "Analyse automatique d'un dataset pour en caractériser le contenu : distributions des valeurs, taux de nullité, valeurs extrêmes (outliers), patterns de format, clés candidates. Étape préalable obligatoire à tout projet data pour comprendre la qualité réelle des données disponibles. Outils : Great Expectations, Soda, Pandas Profiling, dbt.",
+
+  "Processus qualité": "Conception et mise en place de workflows garantissant la qualité des données : contrôles à la source, validation à l'ingestion, tests automatisés dans les pipelines, alertes en cas d'anomalie, processus de correction et de retour vers la source. S'inspire des démarches qualité industrielles (PDCA, Six Sigma appliqué à la data).",
+
+  "Six Sigma / Lean": "Méthodologies d'amélioration continue appliquées à la qualité des données. Le Lean élimine les gaspillages (données collectées mais jamais utilisées, transformations inutiles). Le Six Sigma réduit la variabilité des processus data pour atteindre un taux d'erreur inférieur à 3,4 défauts par million d'opportunités. Le niveau Green Belt est souvent suffisant pour un Data Quality Manager.",
+
+  "Reporting qualité": "Production de tableaux de bord et rapports permettant de suivre l'évolution des métriques de qualité des données dans le temps, d'identifier les sources problématiques et de démontrer le ROI des initiatives qualité. Inclut la définition de SLA de qualité par domaine de données et leur communication aux parties prenantes.",
+
+  "Remédiation de données": "Processus de correction des données incorrectes, incomplètes ou incohérentes détectées par les contrôles qualité. Inclut la correction manuelle, les scripts de nettoyage automatisés, le retour vers la source pour correction à la racine, et la documentation des corrections effectuées. La règle d'or : corriger à la source plutôt qu'en aval.",
+
+  "Éthique appliquée": "Application pratique de principes éthiques philosophiques (utilitarisme, déontologie, éthique des vertus) à des décisions concrètes sur l'usage des données et des algorithmes. En contexte data, implique d'évaluer les impacts sociaux des systèmes IA sur différentes populations, de gérer les conflits entre efficacité algorithmique et équité, et de documenter les raisonnements éthiques.",
+
+  "Détection de biais algorithmiques": "Identification et mesure des biais systématiques dans les modèles ML qui produisent des résultats injustes pour certains groupes (genre, origine, âge). Utilise des métriques de fairness : parité démographique, égalité des chances, égalité des taux d'erreur. Outils : IBM AI Fairness 360, Fairlearn (Microsoft), What-If Tool (Google).",
+
+  "Évaluation d'impact (AIPD/DPIA)": "Analyse d'Impact relative à la Protection des Données (AIPD), obligatoire sous l'Art. 35 du RGPD pour les traitements à risque élevé. Évalue les risques pour les droits et libertés des personnes, identifie les mesures d'atténuation et documente les décisions. Doit être réalisée avant la mise en œuvre du traitement, pas après.",
+
+  "Droit numérique": "Corpus juridique encadrant l'usage des technologies numériques et des données : RGPD, Directive NIS2, EU AI Act, Règlement sur les services numériques (DSA), Règlement sur les marchés numériques (DMA), droit d'auteur appliqué aux données et aux modèles IA. Connaissance essentielle pour tout rôle à l'intersection de la data et de la conformité.",
+
+  "Communication": "Compétence transversale de transmission claire d'informations à des audiences variées (techniques et non-techniques), à l'écrit et à l'oral. En contexte data ethics, implique de rédiger des politiques d'usage éthique compréhensibles, d'animer des formations de sensibilisation et de communiquer les risques éthiques sans alarmisme ni minimisation.",
+
+  "Philosophie de l'IA": "Réflexion critique sur les fondements et les implications philosophiques de l'intelligence artificielle : nature de l'intelligence, conscience des machines, responsabilité morale des systèmes autonomes, impact sur la définition du travail humain. Nourrit la pratique de l'éthique IA en lui donnant un cadre conceptuel rigoureux au-delà des simples checklists de conformité.",
+
+  "RGPD (Règlement UE 2016/679)": "Règlement européen sur la protection des données personnelles, applicable depuis le 25 mai 2018 dans tous les États membres. Définit les droits des personnes (accès, rectification, effacement, portabilité, opposition), les obligations des responsables de traitement (licéité, minimisation, transparence), le rôle du DPO (Art. 37-39) et les sanctions (jusqu'à 20M€ ou 4% du CA mondial).",
+
+  "Directive ePrivacy & Règlement ePrivacy (en cours)": "La Directive ePrivacy (2002/58/CE, modifiée en 2009) encadre la confidentialité des communications électroniques et l'usage des cookies. Un Règlement ePrivacy est en cours de négociation depuis 2017 pour la remplacer et s'aligner sur le RGPD. En attendant son adoption, la Directive reste applicable avec des transpositions nationales variables selon les États membres.",
+
+  "DORA (Règlement UE 2022/2554 — secteur financier uniquement)": "Règlement européen sur la résilience opérationnelle numérique du secteur financier (Digital Operational Resilience Act), applicable depuis le 17 janvier 2025. Concerne exclusivement les entités financières (banques, assurances, entreprises d'investissement) et leurs prestataires TIC critiques. Impose des exigences en matière de gestion des risques TIC, de tests de résilience et de notification des incidents. Hors secteur financier, il n'est pas applicable.",
+
+  "Analyse d'impact AIPD/DPIA": "Voir 'Évaluation d'impact (AIPD/DPIA)'. Dans le contexte DPO, l'AIPD est une obligation légale (Art. 35 RGPD) pour les traitements susceptibles d'engendrer un risque élevé, notamment le profilage, le traitement à grande échelle de données sensibles, et la surveillance systématique d'espaces accessibles au public.",
+
+  "Droit des données personnelles": "Branche du droit encadrant la collecte, le traitement, la conservation et le transfert des données à caractère personnel. Comprend le RGPD, les législations nationales complémentaires (Loi Informatique et Libertés en France, modifiée en 2019), la jurisprudence de la CJUE et les délibérations de la CNIL. En constante évolution avec les décisions des autorités de contrôle européennes.",
+
+  "Relations CNIL & autorités européennes": "Gestion de la relation avec la Commission Nationale Informatique et Libertés (autorité de contrôle française) et le Comité européen de la protection des données (CEPD). Inclut la réponse aux demandes d'information, la gestion des contrôles, la notification des violations de données (Art. 33-34 RGPD) dans les 72 heures, et la participation aux procédures de coopération européenne.",
+
+  "Règlement UE 2024/1689 — calendrier : interdictions (fév. 2025), GPAI (août 2025), haut risque (août 2026)": "Application progressive du Règlement européen sur l'IA. Les pratiques IA interdites (manipulation cognitive, notation sociale) sont applicables depuis le 2 février 2025. Les obligations relatives aux modèles d'IA à usage général (GPAI — Titre VIII) s'appliquent depuis le 2 août 2025. Les obligations pour les systèmes IA à haut risque (Annexe III) s'appliqueront à partir du 2 août 2026.",
+
+  "Classification des risques IA (inacceptable / haut / limité / minimal)": "Taxonomie centrale du Règlement UE 2024/1689. Risque inacceptable : systèmes interdits (manipulation subliminale, notation sociale par autorités publiques). Haut risque : systèmes à fort impact sur droits fondamentaux (biométrie, recrutement, crédit, éducation — Annexe III). Risque limité : obligations de transparence (chatbots, deepfakes). Risque minimal : majorité des applications IA (filtres anti-spam, jeux vidéo).",
+
+  "Audit de systèmes IA et documentation technique (Annexe IV)": "Évaluation de la conformité des systèmes IA à haut risque selon le Règlement UE 2024/1689. L'Annexe IV liste les éléments obligatoires de la documentation technique : description du système, données d'entraînement, performance et limites, mesures de cybersécurité, surveillance humaine. L'audit peut être réalisé en interne (auto-évaluation) ou par un organisme notifié tiers selon la catégorie du système.",
+
+  "Gouvernance algorithmique & registre des systèmes IA": "Mise en place d'un cadre de contrôle interne sur les algorithmes et modèles IA déployés : inventaire exhaustif, classification par risque, documentation des décisions de conception, processus de validation avant déploiement, surveillance post-déploiement. Le Règlement UE 2024/1689 (Art. 60) impose un registre européen des systèmes IA à haut risque accessible au public.",
+
+  "Liaison avec les autorités nationales de contrôle (CNIL en France)": "En France, la CNIL est désignée comme autorité nationale compétente pour l'EU AI Act dans sa dimension protection des données. Implique de maintenir une relation proactive avec la CNIL, de participer aux consultations publiques sur les lignes directrices EU AI Act, et de gérer les éventuelles procédures de contrôle ou sanctions.",
+
+  "Conformité GPAI (General Purpose AI — Titre VIII)": "Obligations spécifiques aux fournisseurs de modèles d'IA à usage général (GPAI) sous le Titre VIII du Règlement UE 2024/1689. Comprend la documentation technique, les politiques de droits d'auteur pour les données d'entraînement, et pour les modèles présentant des risques systémiques (dépassant 10²⁵ FLOPs d'entraînement) : évaluation adversariale, notification à la Commission européenne et signalement des incidents.",
+
+  /* ── INGÉNIERIE & INFRASTRUCTURE ── */
+  "Architecture data (Data Mesh, Lakehouse, Data Vault 2.0)": "Patterns d'architecture pour organiser les systèmes de données à l'échelle. Data Mesh (Zhamak Dehghani, 2019) : décentralisation par domaines métier avec des équipes autonomes. Lakehouse : convergence du Data Lake (stockage brut) et du Data Warehouse (gouvernance, performances) — implémenté par Databricks et Delta Lake. Data Vault 2.0 (Dan Linstedt) : modélisation d'entrepôt de données orientée auditabilité et historisation.",
+
+  "Modélisation conceptuelle & physique": "La modélisation conceptuelle représente les entités métier et leurs relations (ex : Diagramme Entité-Relation) indépendamment de toute technologie. La modélisation physique traduit ce modèle en structures de tables concrètes optimisées pour un SGBD cible (index, partitionnement, types de données). La modélisation logique constitue l'étape intermédiaire.",
+
+  "Patterns d'intégration (ELT, CDC, streaming)": "Approches d'intégration des données entre systèmes. ELT (Extract-Load-Transform) : chargement brut puis transformation dans le data warehouse — standard avec les plateformes cloud modernes. CDC (Change Data Capture) : capture en temps réel des modifications dans les bases sources via les journaux de transactions (Debezium). Streaming : traitement des données en flux continu (Apache Kafka, Flink).",
+
+  "Cloud architecture (AWS, GCP, Azure)": "Conception de solutions data sur les plateformes cloud majeures selon les Well-Architected Frameworks publiés par AWS, Google et Microsoft. Implique de sélectionner les services managés appropriés (S3/GCS/ADLS pour le stockage, Redshift/BigQuery/Synapse pour l'analytique), de concevoir pour la résilience (multi-AZ, réplication) et d'optimiser les coûts.",
+
+  "Sécurité des données": "Protection des données contre les accès non autorisés, les fuites et les corruptions : chiffrement au repos (AES-256) et en transit (TLS 1.3), gestion des identités et accès (IAM), audit des accès, anonymisation et pseudonymisation, classification par sensibilité. En contexte cloud, s'appuie sur les modèles de responsabilité partagée des fournisseurs.",
+
+  "Gouvernance technique": "Définition des standards techniques qui s'appliquent à l'ensemble de l'écosystème data : conventions de nommage, patterns d'architecture approuvés, processus de revue de code, gestion des dépendances, documentation obligatoire. Permet de maintenir la cohérence et la maintenabilité d'un système data à mesure qu'il grandit.",
+
+  "Python / Scala": "Langages de programmation dominants en ingénierie data. Python (langage dynamique et polyvalent) est le standard de facto pour les pipelines data, le ML et l'orchestration. Scala (langage statiquement typé, JVM) est utilisé pour Apache Spark en production haute performance. La plupart des Data Engineers maîtrisent Python et connaissent suffisamment Scala pour lire et modifier le code Spark.",
+
+  "SQL avancé": "Maîtrise des fonctionnalités SQL au-delà du SELECT de base : fonctions fenêtrées (OVER, PARTITION BY, LAG, LEAD, RANK), CTEs (WITH récursif), sous-requêtes corrélées, optimisation de requêtes (plans d'exécution, index), opérations sur les JSON/ARRAY dans les bases modernes (PostgreSQL, BigQuery, Snowflake). Compétence fondamentale pour tout rôle data.",
+
+  "Apache Spark / Flink": "Apache Spark : framework de traitement distribué de données en mémoire, standard pour les pipelines batch et streaming à grande échelle. Flink : framework de traitement de flux (stream processing) natif, avec une sémantique de temps plus précise que Spark Streaming. Spark est plus répandu, Flink est préféré pour les use cases de streaming temps réel strict.",
+
+  "Orchestration (Airflow, Prefect, Dagster)": "Gestion du séquencement, de la planification et de la surveillance des pipelines data. Apache Airflow (ASF) : le standard historique, basé sur des DAGs Python. Prefect : alternative moderne avec une meilleure gestion des erreurs. Dagster : approche asset-centric où chaque artefact data est un asset observable. Le choix dépend de la maturité de l'équipe et de la complexité des pipelines.",
+
+  "Data warehousing (Kimball, Data Vault)": "Méthodologies de conception d'entrepôts de données. Kimball (Ralph Kimball) : modélisation dimensionnelle en étoile (faits + dimensions), orientée requêtes analytiques — prédominante dans les projets BI traditionnels. Data Vault (Dan Linstedt) : modélisation en Hubs (entités), Links (relations), Satellites (attributs) — orientée auditabilité et chargement incrémental.",
+
+  "Streaming temps réel (Kafka, Flink)": "Traitement de données en flux continu, sans attente d'un batch. Apache Kafka (Confluent/ASF) : plateforme de messagerie distribuée haute disponibilité, standard pour l'ingestion de données en streaming. Apache Flink : moteur de traitement de flux avec garanties exactly-once, gestion des fenêtres temporelles, et jointures sur flux. Compétence clé pour les architectures lambda et kappa.",
+
+  "AWS / GCP / Azure (services data managés)": "Services cloud managés dédiés à la data. AWS : S3 (stockage), Glue (ETL), Redshift (DW), EMR (Spark managé), Kinesis (streaming). GCP : BigQuery (DW serverless), Dataflow (Beam managé), Pub/Sub (messaging), Vertex AI (ML). Azure : ADLS Gen2 (stockage), Synapse Analytics (DW), Data Factory (ETL), Event Hubs (streaming). La certification cloud spécifique est fortement valorisée.",
+
+  "Infrastructure as Code (Terraform, Pulumi)": "Gestion de l'infrastructure cloud via du code versionné et reproductible. Terraform (HashiCorp) : langage déclaratif HCL, multi-cloud, le plus répandu. Pulumi : utilise des langages de programmation courants (Python, TypeScript) plutôt qu'un DSL. Permet de versionner l'infrastructure, de l'auditer et de la recréer à l'identique dans plusieurs environnements.",
+
+  "Containerisation (Docker, Kubernetes)": "Docker : packaging d'une application et de ses dépendances dans un conteneur portable et reproductible. Kubernetes (CNCF) : orchestration de conteneurs à l'échelle — déploiement, mise à l'échelle automatique, auto-guérison. En data engineering, permettent de déployer des pipelines, des modèles ML (via FastAPI) et des outils comme Airflow de façon portable et scalable.",
+
+  "Sécurité cloud (IAM, encryption at rest/transit)": "IAM (Identity and Access Management) : gestion fine des droits d'accès aux ressources cloud selon le principe du moindre privilège. Chiffrement au repos : protection des données stockées (S3-SSE, BigQuery CMEK, Azure Storage encryption). Chiffrement en transit : protection des données en circulation (TLS 1.3, VPN, Private Link). Fondamental pour toute architecture cloud conforme au RGPD.",
+
+  "Optimisation des coûts cloud (FinOps)": "Pratique de gestion financière du cloud (FinOps Foundation) visant à maximiser la valeur des dépenses cloud data : analyse des coûts par workload, rightsizing des instances, utilisation des instances spot/préemptibles pour les jobs batch, optimisation des requêtes BigQuery/Redshift, mise en place de budgets et d'alertes. La FinOps Foundation propose un référentiel de bonnes pratiques.",
+
+  "Architectures serverless": "Approche où l'infrastructure est entièrement gérée par le fournisseur cloud, sans provisionnement de serveurs : AWS Lambda, Cloud Functions (GCP), Azure Functions. En data, s'applique aux ETL légers (AWS Glue Serverless, BigQuery Scheduled Queries), au streaming (Kinesis Data Firehose) et aux APIs d'inférence ML. Avantage : coût à l'usage, scalabilité automatique. Limite : latence froide, contraintes de durée d'exécution.",
+
+  "SQL avancé & query tuning": "Optimisation des performances des requêtes SQL sur de grands volumes : lecture et interprétation des plans d'exécution (EXPLAIN ANALYZE), utilisation appropriée des index (B-tree, hash, partial index), réécriture des requêtes pour éviter les full scans, partitionnement des tables, statistiques de l'optimiseur. Compétence critique pour un DBA gérant des bases de production sous forte charge.",
+
+  "Administration SGBD (PostgreSQL, Oracle, SQL Server, MySQL)": "Gestion opérationnelle des systèmes de gestion de bases de données relationnelles : installation, configuration, gestion des utilisateurs et des droits, monitoring des performances, application des patches de sécurité, gestion des tablespaces et de la croissance des données. Chaque SGBD a ses spécificités — PostgreSQL est le plus répandu en open source, Oracle en enterprise.",
+
+  "Backup & disaster recovery (RPO/RTO)": "RPO (Recovery Point Objective) : perte de données maximale acceptable en cas d'incident — détermine la fréquence des sauvegardes. RTO (Recovery Time Objective) : durée maximale acceptable de l'interruption de service — détermine les stratégies de bascule. Les plans de DR incluent les sauvegardes complètes/incrémentales, les tests réguliers de restauration et les procédures de bascule documentées.",
+
+  "Haute disponibilité (réplication, clustering)": "Architectures garantissant la continuité du service en cas de défaillance d'un composant. Réplication : synchronisation en temps réel des données vers un ou plusieurs nœuds secondaires (PostgreSQL streaming replication, MySQL Group Replication). Clustering : plusieurs nœuds partagent la charge et peuvent se substituer l'un à l'autre (Patroni pour PostgreSQL, Oracle RAC).",
+
+  "Sécurité BDD (audit, chiffrement)": "Protection des bases de données contre les accès non autorisés et la fuite de données : journalisation des accès (audit trail), chiffrement transparent des données au repos (TDE — Transparent Data Encryption), masquage des données sensibles pour les environnements non-production, gestion rigoureuse des comptes à privilèges (DBA, superuser).",
+
+  "Monitoring de performance": "Surveillance continue des métriques clés d'une base de données : temps de réponse des requêtes, utilisation CPU/mémoire/I/O, hit ratio du cache, locks et deadlocks, croissance des données. Outils : pgBadger, pg_stat_statements (PostgreSQL), Datadog Database Monitoring, Prometheus + Grafana. Permet d'anticiper les problèmes avant qu'ils impactent la production.",
+
+  "Modélisation conceptuelle / logique / physique": "Les trois niveaux de modélisation des données. Conceptuel : représentation métier (entités, relations) indépendante de toute technologie (Diagramme Entité-Association). Logique : formalisation des structures de données avec types génériques (tables, colonnes, clés). Physique : implémentation concrète dans un SGBD cible avec optimisations (types de données exacts, index, partitionnement).",
+
+  "Merise / UML": "Méthodes de modélisation des systèmes d'information. Merise (méthode française des années 80) : modélisation des données (MCD → MLD → MPD) et des traitements — encore répandue dans les DSI françaises. UML (Unified Modeling Language, OMG) : ensemble de diagrammes standard pour modéliser des systèmes logiciels (diagrammes de classe, de séquence, d'activité, de composants).",
+
+  "Data Vault 2.0 / Kimball / Inmon": "Trois méthodologies de modélisation d'entrepôts de données. Inmon (Bill Inmon, 1990) : approche top-down, modélisation normalisée 3NF, puis data marts. Kimball (Ralph Kimball) : approche bottom-up, modélisation dimensionnelle en étoile ou en flocon. Data Vault 2.0 (Dan Linstedt, 2013) : modélisation en Hubs/Links/Satellites, agnostique du métier, optimale pour les charges incrémentales et l'auditabilité.",
+
+  "Ontologies & taxonomies": "Représentations formelles de la connaissance d'un domaine. Taxonomie : hiérarchie de classification (produits → catégories → sous-catégories). Ontologie : réseau de concepts avec relations sémantiques (un Employé 'travaille pour' une Entreprise, 'habite dans' une Ville). Utilisées dans les Knowledge Graphs, les moteurs de recherche sémantique et les systèmes RAG pour les LLMs.",
+
+  "CI/CD data (GitHub Actions, GitLab CI)": "Application des pratiques DevOps aux pipelines data : intégration continue (tests automatisés à chaque commit) et déploiement continu (mise en production automatisée après validation). GitHub Actions et GitLab CI sont les outils les plus répandus. Concrètement : chaque modification de pipeline dbt déclenche des tests de qualité des données avant déploiement en production.",
+
+  "Tests automatisés de données (contrats de données)": "Vérification automatique que les données respectent des contrats définis : schéma, types, contraintes de valeur, fraîcheur, unicité. Les contrats de données (data contracts, Chad Sanderson) formalisent les engagements entre producteurs et consommateurs de données. Outils : Great Expectations, Soda Core, dbt tests, Schemathesis.",
+
+  "Observabilité des pipelines (data lineage, alerting)": "Capacité à comprendre ce qui se passe à l'intérieur des pipelines data via trois piliers : métriques (volumes, latences, taux d'erreur), logs (trace des exécutions), et traces (data lineage). Les outils d'observabilité data comme Monte Carlo, Datafold, ou Bigeye permettent de détecter proactivement les anomalies avant qu'elles impactent les utilisateurs.",
+
+  "Infrastructure as Code": "Voir 'Infrastructure as Code (Terraform, Pulumi)'. Principe général de gestion de l'infrastructure via du code versionné, permettant reproductibilité, traçabilité et collaboration.",
+
+  "Python": "Langage de programmation polyvalent, dominant dans l'écosystème data et IA. Sa syntaxe claire, son écosystème de bibliothèques (NumPy, Pandas, scikit-learn, PyTorch, LangChain) et sa communauté massive en font le langage de référence pour les Data Engineers, Data Scientists, ML Engineers et AI Engineers. Python 3.10+ est la version standard en 2026.",
+
+  "Versioning de données (DVC, lakeFS)": "Contrôle de version appliqué aux datasets et aux artefacts ML, analogue à Git pour le code. DVC (Data Version Control) : versionne les données et les modèles en les stockant dans des systèmes de fichiers (S3, GCS) tout en traçant les métadonnées dans Git. lakeFS : couche Git-like sur un Data Lake existant (S3, Azure, GCS) permettant branches, commits et rollbacks sur les données.",
+
+  "Déploiement de modèles ML (REST API, batch, edge)": "Mise en production de modèles ML selon trois modes. REST API : service web synchrone (FastAPI + Uvicorn) pour les prédictions en temps réel. Batch : exécution périodique sur un dataset complet (scoring mensuel). Edge : déploiement sur des appareils à capacité de calcul limitée (mobile, IoT) avec des modèles quantifiés ou distillés. Chaque mode implique des contraintes de latence, de scalabilité et de coût différentes.",
+
+  "Monitoring (data drift, concept drift, métriques de performance)": "Surveillance continue des modèles ML en production. Data drift : changement dans la distribution des données d'entrée (les clients d'aujourd'hui ressemblent moins au dataset d'entraînement). Concept drift : changement dans la relation entre les features et la cible (un modèle de crédit entraîné avant une crise économique devient moins fiable après). Outils : Evidently AI, Arize, WhyLogs, Alibi-Detect.",
+
+  "MLflow / Kubeflow / Metaflow": "Plateformes MLOps pour gérer le cycle de vie des modèles ML. MLflow (Databricks) : tracking d'expériences, model registry, serving — le plus adopté. Kubeflow (Google/CNCF) : pipelines ML sur Kubernetes, intégration native GCP. Metaflow (Netflix/open source) : framework Python pour orchestrer des workflows ML complexes avec gestion native des ressources cloud.",
+
+  "Docker / Kubernetes": "Docker : conteneurisation des applications et de leurs dépendances pour la portabilité. Kubernetes (CNCF) : orchestration de conteneurs — déploiement, scalabilité automatique (HPA), auto-guérison, rolling updates. En MLOps, Kubernetes est utilisé pour déployer des modèles ML via KServe ou Seldon, et Kubeflow tourne nativement sur Kubernetes.",
+
+  "CI/CD pour ML": "Extension du CI/CD logiciel aux workflows ML : tests automatiques des données d'entraînement, validation des performances du modèle (comparaison avec le champion en production), déploiement automatisé du nouveau modèle si les seuils de performance sont atteints, rollback automatique en cas de dégradation. Tools : CML (DVC), GitHub Actions + MLflow, Weights & Biases Automations.",
+
+  "Feature stores": "Infrastructure centralisée pour stocker, partager et servir les features (variables d'entrée) des modèles ML. Évite la duplication de calcul des features entre l'entraînement et la production (training-serving skew), permet le partage de features entre équipes. Leaders : Feast (open source), Tecton (enterprise), Vertex AI Feature Store (GCP), SageMaker Feature Store (AWS).",
+
+  "Architecture MLOps": "Conception des systèmes MLOps à l'échelle : choix de la plateforme ML managée (Vertex AI, SageMaker, AzureML), design du feature store, architecture du model registry, stratégie de monitoring, organisation des environnements (dev/staging/production). Le ML Engineering Guide de Google (2021) et les niveaux de maturité MLOps (0, 1, 2) constituent les référentiels de base.",
+
+  "Plateformes ML managées (Vertex AI, SageMaker, AzureML)": "Services cloud qui intègrent l'ensemble du cycle de vie ML dans une plateforme gérée. Vertex AI (GCP) : pipelines, feature store, model registry, AutoML, déploiement. SageMaker (AWS) : solution la plus complète, avec SageMaker Studio comme IDE ML. AzureML : forte intégration avec les outils Microsoft (VS Code, GitHub). Réduisent la charge d'infrastructure mais créent un risque de vendor lock-in.",
+
+  "Gouvernance des modèles": "Processus de contrôle du cycle de vie des modèles ML en production : validation éthique et réglementaire avant déploiement, documentation des choix de conception, traçabilité des versions (model versioning), processus d'approbation pour les modèles à impact élevé, surveillance de la conformité EU AI Act pour les modèles à haut risque.",
+
+  "Feature engineering avancé": "Création et transformation de variables d'entrée pour maximiser la performance des modèles ML : encodage des variables catégorielles (target encoding, embeddings), gestion des valeurs manquantes, features temporelles (lag features, rolling statistics), interaction features, features basées sur des connaissances domaine. La qualité du feature engineering influence souvent plus les performances que le choix de l'algorithme.",
+
+  "Sécurité ML (model robustness, adversarial attacks)": "Protection des modèles ML contre les attaques et défaillances. Attaques adversariales : perturbations imperceptibles de l'input qui trompent le modèle (Goodfellow et al., 2014). Robustesse : maintien des performances sous des distributions de données dégradées ou inattendues. Model poisoning : corruption des données d'entraînement. Outils : CleverHans, ART (IBM), Foolbox.",
+
+  "Formation & coaching d'équipes": "Transmission des connaissances et pratiques MLOps à des équipes data science qui ne maîtrisent pas les aspects production. Inclut la création de guides internes, l'organisation de code reviews, l'animation de communautés de pratique et le mentoring des profils juniors. Compétence différenciante pour un MLOps Specialist positionné en expert interne.",
+
+  "Déploiement de LLMs open source (Llama, Mistral) & propriétaires (GPT-4o, Claude)": "Mise en production de grands modèles de langage. LLMs open source (Meta Llama 3, Mistral AI) : déployés sur infrastructure propre via vLLM ou TGI (Text Generation Inference de HuggingFace), permettent la confidentialité des données. LLMs propriétaires (GPT-4o d'OpenAI, Claude d'Anthropic, Gemini de Google) : accessibles via API, sans infrastructure, mais avec envoi des données vers des tiers.",
+
+  "RAG (Retrieval-Augmented Generation) en production": "Architecture combinant un LLM avec une base de connaissances externe pour réduire les hallucinations et permettre l'accès à des informations récentes ou propriétaires. En production, implique de gérer le pipeline complet : chunking des documents, génération des embeddings, indexation dans une vector database, retrieval, reranking et augmentation du prompt. La latence et la pertinence du retrieval sont les deux défis principaux.",
+
+  "Fine-tuning (LoRA, QLoRA, RLHF, DPO)": "Techniques d'adaptation de LLMs pré-entraînés à des tâches spécifiques. LoRA (Low-Rank Adaptation) : entraînement d'une petite fraction des paramètres du modèle, très efficace. QLoRA : LoRA sur modèle quantifié (4-bit), réduit drastiquement les besoins en GPU. RLHF (Reinforcement Learning from Human Feedback) : alignement du modèle sur les préférences humaines via des retours annotés — technique utilisée par OpenAI pour InstructGPT. DPO (Direct Preference Optimization) : alternative plus stable à RLHF.",
+
+  "Monitoring LLM (hallucinations, latence, coûts d'inférence)": "Surveillance spécifique aux systèmes LLM en production. Hallucinations : détection des réponses factuellement incorrectes via des évaluateurs LLM ou des métriques NLP (BERTScore, ROUGE). Latence : monitoring du Time-To-First-Token (TTFT) et du Through-put en tokens/seconde. Coûts : suivi du nombre de tokens consommés par requête et par utilisateur. Outils : LangSmith, Helicone, Phoenix (Arize), Traceloop.",
+
+  "Vector databases (indexation, requêtage)": "Bases de données optimisées pour le stockage et la recherche de vecteurs d'embedding haute dimension (768 à 4096 dimensions typiquement). L'indexation utilise des algorithmes ANN (Approximate Nearest Neighbor) comme HNSW ou IVFFlat. Utilisées comme composant central des architectures RAG. Leaders : Pinecone (SaaS), Weaviate, Qdrant, Chroma (open source), PGVector (extension PostgreSQL).",
+
+  "Sécurité LLM (prompt injection, jailbreak, data leakage)": "Menaces de sécurité spécifiques aux systèmes LLM. Prompt injection : manipulation du LLM via des instructions malveillantes dans le contenu traité (documents, emails) pour lui faire ignorer ses consignes système. Jailbreak : contournement des garde-fous de sécurité via des prompts spécialement conçus. Data leakage : extraction involontaire de données sensibles du contexte ou de la mémoire du modèle. OWASP Top 10 LLM Risks (2023) est le référentiel de référence.",
+
+  /* ── ANALYTICS ENGINEERING ── */
+  "SQL avancé (window functions, CTEs, macros dbt)": "Niveau expert du SQL pour l'analytics engineering. Fonctions fenêtrées : calculs sur des sous-ensembles de données sans réduire le nombre de lignes (ROW_NUMBER, RANK, LAG, LEAD, SUM OVER PARTITION). CTEs (Common Table Expressions) : requêtes nommées réutilisables qui rendent le SQL lisible. Macros dbt : fonctions Jinja réutilisables dans les modèles dbt pour DRY (Don't Repeat Yourself).",
+
+  "dbt (data build tool — core & cloud)": "Outil de transformation de données SQL qui applique les pratiques software engineering à l'analytics : versionning, tests, documentation, modularité. dbt Core est open source, dbt Cloud est la version SaaS avec interface web, scheduler et IDE intégré. Devenu le standard de facto pour la couche transformation dans les stacks data modernes (ELT avec dbt).",
+
+  "Modélisation analytique (Kimball star schema, OBT)": "Patterns de modélisation pour les couches analytiques. Star schema (Kimball) : table de faits centrale reliée à des tables de dimensions dénormalisées — optimisé pour les requêtes analytiques et compréhensible par les utilisateurs métier. OBT (One Big Table) : dénormalisation complète en une seule table — simplifie les requêtes mais augmente la redondance. Le choix dépend du volume, de la complexité et des outils BI utilisés.",
+
+  "Documentation & data lineage automatisé": "dbt génère automatiquement la documentation du catalogue de données (descriptions des modèles, colonnes, tests) et le graphe de lignage des données (DAG) à partir du code SQL. Cette documentation est toujours synchronisée avec le code, contrairement à la documentation manuelle qui se désynchronise rapidement. La commande `dbt docs generate` produit un site web statique.",
+
+  "Tests de données (unicité, fraîcheur, contraintes)": "dbt propose quatre tests natifs : not_null (absence de valeurs nulles), unique (unicité des valeurs), accepted_values (valeurs dans une liste définie), relationships (intégrité référentielle). Des packages comme dbt-expectations (port de Great Expectations) ajoutent des centaines de tests supplémentaires : fraîcheur des données, distributions statistiques, plages de valeurs.",
+
+  "Git / version control": "Système de contrôle de version distribué (Linus Torvalds, 2005) indispensable pour la collaboration sur du code. En analytics engineering, chaque modèle dbt est un fichier SQL versionné dans Git, permettant les code reviews (pull requests), le déploiement automatisé (CI/CD) et la traçabilité de l'évolution des transformations. Compétence de base attendue de tout profil technique.",
+
+  /* ── ANALYSE & REPORTING ── */
+  "SQL (requêtes analytiques complexes)": "Application du SQL à des analyses business sophistiquées : segmentation clients multi-critères, calcul de cohortes, analyses de funnel, attribution marketing, calcul de métriques récursives. Maîtrise des fonctions fenêtrées (rétention, LTV, churn), des CTEs pour décomposer des analyses complexes, et des spécificités SQL des plateformes analytiques (BigQuery, Snowflake, Redshift).",
+
+  "Python ou R (pandas, numpy, scipy)": "Python et R sont les deux langages dominants pour l'analyse de données. Pandas (Python) : manipulation de DataFrames tabulaires — filtrage, agrégation, pivot, jointures. NumPy : calcul numérique sur des tableaux multidimensionnels. SciPy : algorithmes scientifiques (statistiques, optimisation, traitement du signal). R est préféré dans certains contextes académiques et pour des analyses statistiques spécialisées.",
+
+  "Visualisation (Power BI, Tableau, Looker)": "Création de représentations graphiques des données pour faciliter la compréhension et la prise de décision. Power BI (Microsoft) : le plus répandu en entreprise, intégré à l'écosystème Microsoft, modélisation DAX. Tableau : capacités visuelles avancées, forte adoption dans les secteurs analytiques. Looker (Google) : approche LookML (modélisation sémantique), native cloud.",
+
+  "Statistiques descriptives et inférentielles": "Statistiques descriptives : résumer et caractériser un dataset (moyenne, médiane, écart-type, quartiles, distributions). Statistiques inférentielles : tirer des conclusions sur une population à partir d'un échantillon — tests d'hypothèse (t-test, chi², ANOVA), intervalles de confiance, régression. Fondement de toute analyse data rigoureuse.",
+
+  "Excel avancé (Power Query, Power Pivot)": "Fonctionnalités avancées d'Excel pour l'analyse de données. Power Query (M language) : ETL intégré à Excel — connexion à des sources multiples, transformation et nettoyage des données sans code SQL. Power Pivot : modélisation de données multi-tables avec mesures DAX dans Excel. Ces outils permettent aux analystes de construire des rapports complexes sur des millions de lignes.",
+
+  "Storytelling data": "Capacité à construire un récit convaincant autour des données pour influencer une décision. Implique de choisir la visualisation adaptée au message, de structurer la présentation de façon narrative (contexte → problème → analyse → recommandation), et d'adapter le niveau de détail à l'audience. Cole Nussbaumer Knaflic ('Storytelling with Data', 2015) est la référence de ce domaine.",
+
+  "Analyse des besoins métier": "Processus d'investigation et de documentation des besoins réels des parties prenantes : interviews, ateliers de co-construction, observation terrain. Distingue les besoins exprimés (ce que les gens demandent) des besoins réels (ce dont ils ont besoin pour atteindre leurs objectifs). En data, évite de construire des tableaux de bord qui répondent à la mauvaise question.",
+
+  "Modélisation de processus (BPMN 2.0, UML)": "Représentation formelle des processus métier pour les analyser, optimiser et les spécifier pour des développements IT. BPMN 2.0 (Business Process Model and Notation, OMG) : notation standard pour modéliser des flux de travail avec swimlanes, événements, gateways. UML Activity Diagram : alternative pour les processus avec forte logique conditionnelle.",
+
+  "Rédaction de spécifications fonctionnelles": "Production de documents décrivant précisément ce qu'un système data doit faire (le 'quoi') sans prescrire comment le faire (le 'comment'). Inclut les use cases, les règles de gestion, les cas d'erreur, les critères d'acceptance et les wireframes. Constitue le contrat entre les équipes métier et les équipes techniques.",
+
+  "Gestion des parties prenantes": "Management des relations avec les différentes parties ayant un intérêt dans un projet data : définition de la matrice RACI, identification des sponsors, gestion des attentes, communication adaptée à chaque audience, résolution des conflits de priorité entre départements. Compétence critique pour un Business Analyst qui doit coordonner des parties prenantes aux objectifs parfois divergents.",
+
+  "Tests fonctionnels et recette (UAT)": "Validation que la solution data livrée répond aux besoins exprimés dans les spécifications. L'UAT (User Acceptance Testing) fait participer les utilisateurs finaux pour valider que les règles de gestion sont correctement implémentées. Comprend la rédaction de jeux de tests, l'exécution des scénarios, la documentation des anomalies et le suivi des corrections.",
+
+  "Communication cross-fonctionnelle": "Voir 'Communication cross-fonctionnelle' dans Product Management. Dans le contexte Data Translator, c'est la compétence centrale : traduire les analyses techniques en recommandations métier actionnables, et inversement traduire les besoins métier en problèmes data précis.",
+
+  "Connaissance métier large (finance, marketing, RH...)": "Compréhension suffisante des enjeux et processus de plusieurs fonctions de l'entreprise pour identifier les use cases data à valeur ajoutée et crédibiliser les échanges avec les équipes métier. Un Data Translator qui comprend les enjeux du P&L, des campagnes marketing et du turnover RH peut être beaucoup plus proactif dans l'identification des opportunités analytiques.",
+
+  "Vulgarisation de concepts techniques": "Traduction de concepts data complexes en langage accessible à des non-spécialistes, sans sacrifier la précision essentielle. Exemple : expliquer la notion de 'data drift' à un directeur commercial sans utiliser de jargon statistique, mais en lui montrant comment cela affecte la fiabilité des prédictions de ventes.",
+
+  "Identification d'opportunités data & ROI": "Capacité à détecter proactivement les problèmes business qui pourraient être résolus par une approche data, et à en estimer la valeur potentielle avant de lancer un projet. Implique de combiner connaissance métier, conscience des capacités data disponibles et sens économique.",
+
+  "Storytelling data et présentation exécutive": "Version avancée du storytelling data orientée vers les décideurs : structure pyramidale (recommandation en premier), quantification de l'impact business, visualisations lisibles en 10 secondes, anticipation des objections. Inclut la maîtrise des outils de présentation (PowerPoint, Google Slides, Canva) et la gestion du temps de parole en réunion de direction.",
+
+  "Bases en data science et statistiques": "Compréhension conceptuelle (sans nécessité d'implémentation) des méthodes data science : ce qu'est un modèle de classification, comment fonctionne une régression, ce que mesure un test A/B, ce que signifie un intervalle de confiance. Permet au Data Translator de discuter intelligemment des résultats et des limites des modèles avec les équipes data science.",
+
+  "Power BI / Tableau / Qlik / Looker": "Principales plateformes de Business Intelligence. Power BI (Microsoft) : leader marché entreprise en France, fort écosystème Microsoft, tarification attractive. Tableau (Salesforce) : capacités visuelles très avancées, forte adoption dans le conseil et les grandes entreprises. Qlik (Qlik Technologies) : moteur de données associatives unique, fort en exploration ad hoc. Looker (Google) : approche LookML sémantique, native cloud, forte adoption dans les scale-ups.",
+
+  "DAX / MDX (modélisation sémantique)": "Langages de modélisation sémantique pour les outils BI. DAX (Data Analysis Expressions) : langage de formules Power BI pour créer des mesures calculées, tables calculées et colonnes calculées — essentiel pour des rapports Power BI performants. MDX (Multidimensional Expressions) : langage de requêtes pour les cubes OLAP (SQL Server Analysis Services). DAX est le standard actuel pour la majorité des projets Power BI.",
+
+  "Modélisation sémantique (star schema, mesures calculées)": "Construction d'un modèle de données optimisé pour les requêtes analytiques dans un outil BI. Star schema : table de faits (métriques) + tables de dimensions (contexte) — optimise les performances et la compréhensibilité. Mesures calculées : logique métier exprimée en DAX ou LookML — garantissent la cohérence des calculs à travers tous les rapports.",
+
+  "ETL léger (Power Query, Tableau Prep)": "Outils de préparation et transformation des données intégrés aux plateformes BI, sans nécessiter de compétences d'ingénierie data. Power Query (M language, intégré à Power BI et Excel) : connexion à des centaines de sources, nettoyage visuel, transformations reproductibles. Tableau Prep : équivalent pour Tableau, avec interface drag-and-drop intuitive.",
+
+  "UX des dashboards et data visualization": "Application des principes d'expérience utilisateur à la conception de tableaux de bord : hiérarchie visuelle, réduction du bruit cognitif, choix du bon type de graphique selon le message, accessibilité (daltonisme). Référence : 'The Visual Display of Quantitative Information' (Edward Tufte), et les principes de pre-attentive attributes.",
+
+  /* ── DATA SCIENCE & ML ── */
+  "Python (scikit-learn, XGBoost, LightGBM, statsmodels)": "Écosystème Python pour le machine learning. Scikit-learn : bibliothèque de référence pour le ML classique (régression, SVM, Random Forest, clustering, préprocessing). XGBoost et LightGBM : algorithmes de gradient boosting très performants sur les données tabulaires, souvent vainqueurs de compétitions Kaggle. Statsmodels : analyses statistiques inférentielles, modèles économétriques.",
+
+  "Statistiques & probabilités (inférence, tests, distributions)": "Fondements mathématiques du data science. Distributions : normale, binomiale, Poisson, exponentielle — et leurs applications. Inférence : estimation et tests d'hypothèse (p-value, puissance statistique, erreurs de type I/II). Théorème de Bayes et probabilités conditionnelles. Indispensables pour évaluer la significativité des résultats et éviter de tirer des conclusions erronées.",
+
+  "Machine Learning supervisé & non-supervisé": "Deux paradigmes du ML. Supervisé : apprendre à prédire une cible à partir d'exemples étiquetés (classification, régression) — Random Forest, XGBoost, réseaux de neurones. Non-supervisé : trouver des structures dans des données sans étiquettes — clustering (K-Means, DBSCAN, hierarchical), réduction de dimensionnalité (PCA, UMAP, t-SNE), détection d'anomalies.",
+
+  "Expérimentation (A/B testing, tests statistiques, causalité)": "Méthodes rigoureuses pour mesurer l'impact causal d'une intervention. A/B testing : assignation aléatoire de deux variantes à des groupes équivalents, mesure de la différence de métriques. Tests statistiques : t-test, Mann-Whitney, bootstrap. Inférence causale : techniques pour estimer la causalité sur des données observationnelles — DiD (Difference-in-Differences), IV (Variables Instrumentales), PSM (Propensity Score Matching).",
+
+  "Feature engineering & sélection de variables": "Création de nouvelles features à partir des données brutes pour améliorer la performance des modèles : encodage, normalisation, interactions, agrégations temporelles. Sélection de variables : réduction de la dimensionnalité pour éviter l'overfitting et améliorer l'interprétabilité — méthodes filter (corrélation), wrapper (RFE), embedded (Lasso, feature importance).",
+
+  "Communication et présentation des résultats aux métiers": "Adaptation de la communication des résultats data science à des audiences non-techniques : traduction des métriques ML (AUC, RMSE) en métriques business (% de clients bien identifiés, erreur en euros), explication intuitive des modèles (SHAP values pour l'explicabilité locale), gestion des questions sur la fiabilité et les limites.",
+
+  "Python avancé orienté production (tests, refactoring, typing)": "Écriture de code Python de qualité production, pas seulement de notebooks exploratoires. Tests : unitaires (pytest), d'intégration, couverture de code. Refactoring : restructuration du code sans changer son comportement — SOLID principles. Typing : annotations de types statiques (PEP 484) vérifiées avec mypy pour détecter les erreurs à la compilation. Packaging : création de packages Python distribuables.",
+
+  "Deep Learning (PyTorch, TensorFlow / Keras)": "Sous-domaine du ML utilisant des réseaux de neurones profonds. PyTorch (Meta) : le framework de référence en recherche et de plus en plus en production, API pythonique, débogage dynamique. TensorFlow/Keras (Google) : framework mature, forte adoption en production, TensorFlow Lite pour le déploiement mobile. Couvre les architectures CNN, RNN/LSTM, Transformers.",
+
+  "Optimisation de modèles (quantification, pruning, distillation)": "Techniques pour réduire la taille et améliorer la vitesse d'inférence des modèles ML, notamment des LLMs. Quantification : réduction de la précision des poids (FP32 → INT8 → INT4) pour réduire la mémoire et accélérer l'inférence. Pruning : suppression des poids peu importants. Distillation : entraîner un petit modèle (student) à imiter un grand modèle (teacher — ex: DistilBERT issu de BERT).",
+
+  "APIs ML (FastAPI, gRPC)": "Exposition de modèles ML via des interfaces réseau. FastAPI (Python) : framework web asynchrone pour créer des APIs REST performantes autour d'un modèle ML — standard de facto pour le serving de modèles en Python. gRPC : protocole de communication binaire basé sur Protocol Buffers, plus performant que REST pour les communications inter-services à haut débit.",
+
+  "Software engineering (CI/CD, tests unitaires)": "Application des meilleures pratiques du génie logiciel au code ML : architecture modulaire, tests automatisés (pytest), revue de code (pull requests), déploiement continu (CI/CD). Ce qui distingue un ML Engineer d'un Data Scientist : le code ML est traité comme du software professionnel, pas comme des scripts de notebook.",
+
+  "Performance & scalabilité (distributed training, GPU)": "Techniques pour entraîner de grands modèles ML efficacement. Distributed training : répartition de l'entraînement sur plusieurs GPUs ou machines — Data Parallelism (PyTorch DDP), Model Parallelism (Tensor Parallelism), Pipeline Parallelism. Frameworks : DeepSpeed (Microsoft), FSDP (PyTorch), Megatron-LM (NVIDIA). Optimisation GPU : utilisation efficace de la mémoire VRAM, mixed precision training (FP16/BF16).",
+
+  /* ── AI ENGINEERING & GENAI ── */
+  "Intégration de LLMs via API (OpenAI, Anthropic, Mistral, Cohere)": "Utilisation programmatique des APIs des grands fournisseurs de LLMs pour construire des applications. OpenAI (GPT-4o, GPT-4o-mini), Anthropic (Claude 3.5/3.7), Mistral AI (Mistral Large, Codestral), Cohere (Command R+). Comprend la gestion des messages système, le streaming des réponses, la gestion des tokens, les function calls (tool use) et la gestion des erreurs.",
+
+  "Architectures RAG & knowledge bases vectorielles": "Voir 'RAG (Retrieval-Augmented Generation) en production'. Les knowledge bases vectorielles sont le composant de stockage des embeddings dans une architecture RAG. La qualité du RAG dépend de la stratégie de chunking (fixed-size, recursive, semantic), du modèle d'embedding (text-embedding-3-large, e5-mistral), et de la stratégie de retrieval (dense, sparse, hybrid BM25+dense).",
+
+  "Agents IA autonomes (LangChain, CrewAI, AutoGen, LangGraph)": "Systèmes LLM capables de planifier et d'exécuter des séquences d'actions pour accomplir des objectifs complexes. LangChain : framework d'orchestration LLM très répandu. LangGraph : extension de LangChain pour les agents avec état (stateful agents) et workflows cycliques. CrewAI : orchestration de plusieurs agents spécialisés en équipe. AutoGen (Microsoft) : framework pour agents conversationnels multi-rôles.",
+
+  "Python niveau production (tests, typage, packaging)": "Voir 'Python avancé orienté production'. Dans le contexte AI Engineer, s'applique spécifiquement à la construction d'applications LLM robustes : isolation des dépendances (pyproject.toml, uv), tests des composants LLM (mocking des APIs, évaluation des prompts), documentation des chaînes de traitement.",
+
+  "Évaluation et benchmarking de systèmes IA (RAGAS, DeepEval)": "Mesure objective de la qualité des systèmes LLM/RAG. RAGAS (Retrieval Augmented Generation Assessment) : framework open source mesurant la fidélité des réponses au contexte, la pertinence des réponses, la précision du contexte et le rappel du contexte. DeepEval : framework de tests unitaires pour LLMs avec plus de 14 métriques. Indispensable pour détecter les régressions lors des mises à jour de modèles ou de prompts.",
+
+  "Sécurité des systèmes IA (prompt injection, guardrails, PII)": "Protection des applications LLM. Prompt injection : attaque où du contenu malveillant dans les données traitées modifie le comportement du LLM. Guardrails : mécanismes de filtrage des inputs et outputs (NeMo Guardrails de NVIDIA, Llama Guard de Meta). PII (Personally Identifiable Information) : détection et masquage des données personnelles avant envoi au LLM pour la conformité RGPD. Référence : OWASP Top 10 for LLM Applications (2023, v1.1).",
+
+  "Prompt engineering avancé (chain-of-thought, few-shot, constitutional AI)": "Techniques avancées de conception de prompts. Chain-of-thought (CoT, Wei et al., 2022) : inciter le modèle à raisonner étape par étape pour améliorer les performances sur des tâches complexes. Few-shot : fournir des exemples d'entrée/sortie dans le prompt pour guider le modèle. Constitutional AI (Anthropic) : guidage du comportement du modèle via des principes explicites. Tree of Thoughts : exploration de plusieurs chemins de raisonnement en parallèle.",
+
+  "Évaluation de LLMs en production (RAGAS, DeepEval, benchmarks custom)": "Voir 'Évaluation et benchmarking de systèmes IA'. Les benchmarks custom sont des jeux de tests spécifiques au domaine métier (ex : questions-réponses juridiques, diagnostic médical) qui mesurent la performance du système sur les cas d'usage réels de l'entreprise, au-delà des benchmarks génériques.",
+
+  "Orchestration de chaînes de prompts et workflows GenAI": "Conception et gestion de pipelines multi-étapes où la sortie d'un LLM devient l'entrée du suivant, ou où plusieurs modèles collaborent. LangChain et LangGraph sont les frameworks standards. Implique de gérer la cohérence du contexte entre les étapes, les erreurs de chaque composant, et l'observabilité de l'ensemble de la chaîne.",
+
+  "Détection et mitigation des hallucinations": "Les hallucinations LLM sont des affirmations factuellement incorrectes présentées avec confiance. Techniques de mitigation : RAG (ancrer les réponses dans des faits vérifiables), vérification via un second LLM 'critique', structured outputs (JSON schema pour contraindre le format), temperature faible (0.0-0.3 pour plus de déterminisme). Évaluation : RAGAS Faithfulness metric, FactScore.",
+
+  "Benchmarking comparatif de modèles (open source vs propriétaires)": "Évaluation systématique de différents LLMs sur un cas d'usage spécifique pour sélectionner le meilleur compromis qualité/coût/latence/confidentialité. Implique de construire un jeu de tests représentatif, de définir des métriques d'évaluation, de tester plusieurs modèles (GPT-4o, Claude 3.5, Mistral Large, Llama 3) et de documenter les résultats. Leaderboards de référence : LMSYS Chatbot Arena, Open LLM Leaderboard (HuggingFace)."
+
+};
+
+/* ============================================================
+   PARCOURS DE CARRIÈRE STATIQUES — 33 métiers
+   Sources : LinkedIn Jobs on the Rise 2026, Apec études métiers data 2025,
+   Factoriel Q4 2025, référentiels DAMA-DMBOK v2, France Compétences
+   ============================================================ */
+const CAREER_PATHS = {
+
+  "Chief Data Officer (CDO)": "Le CDO est un rôle de direction qui se construit sur 12 à 15 ans. Le parcours typique commence par une formation de niveau Bac+5 en informatique, mathématiques appliquées, ingénierie ou école de commerce avec spécialisation data. Les 5 à 7 premières années sont consacrées à des fonctions analytiques ou techniques : analyse de données, architecture, ou conseil en systèmes d'information. Une phase intermédiaire de 4 à 6 ans en management d'équipes data ou en direction de projets data stratégiques est généralement nécessaire. La promotion au rôle de CDO survient souvent à la suite d'un succès mesurable dans la transformation data d'une organisation. Les parcours atypiques incluent : des directeurs métier (finance, marketing) reconvertis après avoir piloté des projets data transformateurs, ou des consultants en stratégie data ayant rejoint un client.",
+
+  "Chief Analytics Officer (CAO)": "Le CAO se construit sur 10 à 14 ans, souvent avec un profil plus orienté analyse que le CDO. Le départ se fait généralement par une formation Bac+5 en statistiques, économétrie, mathématiques ou ingénierie. Les premières années (4 à 6 ans) sont consacrées à l'analyse avancée, la modélisation statistique ou l'économétrie appliquée. Une phase de 4 à 5 ans en responsabilité d'équipes analytics ou BI suit, souvent avec un périmètre croissant. Dans les PME, le rôle est souvent fusionné avec celui de CDO. Les parcours alternatifs incluent des chercheurs en économie ou statistiques issus du monde académique, et des consultants en analytics ayant rejoint une entreprise.",
+
+  "Chief AI Officer (CAIO)": "Rôle très récent (émergence 2022-2024), le CAIO n'a pas encore de parcours canonique établi. Deux voies principales s'observent sur le marché français en 2026. La première, technique : 8 à 12 ans en recherche en IA, engineering ML ou direction technique de produits IA, avec une évolution vers des responsabilités managériales et stratégiques croissantes. La seconde, stratégique : un CDO ou Directeur Digital ayant développé une expertise IA approfondie et assumé la responsabilité de programmes IA majeurs. Des profils de conseil en stratégie spécialisés en IA rejoignent également ce rôle. La formation initiale est généralement de niveau Bac+5/Bac+8 en informatique, mathématiques, ou intelligence artificielle.",
+
+  "Data Strategist": "Le Data Strategist se construit en 8 à 12 ans, avec une combinaison rare de compréhension technique et de sens business. La formation initiale est typiquement Bac+5 en école d'ingénieur, école de commerce ou master en systèmes d'information. Les 4 à 6 premières années se déroulent dans des fonctions analytiques ou de conseil en systègie SI/data. Une phase de 3 à 5 ans dans des missions de conseil en stratégie data ou en pilotage de transformation data est généralement nécessaire. Ce rôle est souvent occupé par d'anciens consultants en stratégie reconvertis data, ou des profils data techniques ayant développé un fort sens business au contact des directions générales.",
+
+  "Data Product Manager": "Le Data Product Manager arrive généralement après 4 à 8 ans d'expérience. Les parcours les plus directs partent d'une formation Bac+5 en informatique, école de commerce, ou école d'ingénieur. Les 2 à 4 premières années s'exercent souvent dans une fonction analytique, technique ou de product management généraliste. La transition vers la spécialisation data se fait soit naturellement dans des entreprises data-driven (scale-ups, e-commerce), soit par une formation complémentaire en product management. Les parcours atypiques incluent des profils métier (marketing, finance) qui se spécialisent en data product après avoir été utilisateurs intensifs de produits data.",
+
+  "AI/ML Product Manager": "Parcours similaire au Data Product Manager, avec une spécialisation IA acquise par la suite. La formation initiale est généralement technique (ingénierie, informatique) ou combo technique/business. Après 2 à 4 ans en product management ou rôle analytique, la spécialisation AI/ML s'acquiert soit dans une entreprise qui développe des produits IA, soit par une formation complémentaire (cours en ligne, certifications ML). Les profils issus du développement logiciel ou du data science qui pivotent vers le product management constituent une voie alternative très appréciée.",
+
+  "Data Governance Manager": "Rôle senior construit sur 6 à 10 ans. Deux voies principales : la voie technique (Data Engineer ou Architecte data évoluant vers la gouvernance) et la voie fonctionnelle (analyste métier ou responsable qualité se spécialisant en gouvernance des données). La formation initiale est variable : informatique, droit, école de commerce ou ingénieur. Une expertise dans un référentiel reconnu (DAMA-DMBOK, DCAM) et idéalement une certification (CDMP — Certified Data Management Professional de DAMA) est fortement valorisée. Les profils issus du conseil en systèmes d'information avec expérience en gouvernance constituent un troisième parcours fréquent.",
+
+  "Data Steward": "Rôle accessible après 3 à 6 ans, souvent occupé par des profils métier reconvertis data. Deux grands parcours : des profils issus d'une fonction métier (finance, RH, marketing, supply chain) qui développent des compétences data par la pratique au sein de leur département ; ou des profils techniques juniors qui se spécialisent sur la qualité et la conformité des données. La formation initiale est large : BTS, licence ou master dans un domaine métier ou en informatique. C'est souvent un rôle exercé en complément d'une fonction principale, pas en rôle dédié à temps plein dans les PME.",
+
+  "Data Quality Manager": "Construit sur 4 à 8 ans, avec une combinaison de compétences techniques et de management des processus. La formation initiale en informatique, statistiques ou qualité (QHSE) constitue les bases. Les premières années s'exercent en analyse de données ou en contrôle qualité data. L'évolution vers la responsabilité de la qualité data à l'échelle de l'organisation vient avec l'expérience. Des certifications qualité (Six Sigma Green Belt) combinées à une expertise data renforcent le profil. Les profils issus du domaine QHSE industriel qui se reconvertissent data constituent un parcours alternatif émergent.",
+
+  "Data Ethics Officer": "Rôle très récent sans parcours unique établi. Trois profils types coexistent en 2026 : des juristes spécialisés en droit numérique qui élargissent leur champ vers l'éthique algorithmique ; des data scientists ou ML engineers sensibilisés aux enjeux éthiques qui formalisent cette expertise en rôle dédié ; et des philosophes ou chercheurs en sciences sociales qui se spécialisent sur l'éthique des technologies. Une formation Bac+5 ou Bac+8 est généralement attendue. Des diplômes universitaires spécifiques commencent à émerger (Masters en éthique du numérique, IA responsable).",
+
+  "DPO / Data Privacy Officer": "Le DPO est souvent un juriste de formation (droit, DESS/master en droit des affaires, droit du numérique) avec 6 à 10 ans d'expérience. Deux parcours dominants : des juristes d'entreprise ou de cabinet spécialisés en droit des technologies qui se certifient sur le RGPD ; ou des responsables de la conformité (compliance) qui se spécialisent sur la protection des données. La certification CIPP/E (IAPP — International Association of Privacy Professionals) est le standard international reconnu. La CNIL propose également des formations de référence en France. Les profils issus des fonctions SI ou data security constituent un parcours alternatif de plus en plus fréquent.",
+
+  "AI Governance Manager": "Rôle critique né du Règlement UE 2024/1689, sans parcours établi avant 2024. Les profils actuellement en poste viennent de trois horizons : des DPO/juristes ayant étendu leur champ au-delà du RGPD pour couvrir l'EU AI Act ; des responsables conformité ou risk managers s'étant spécialisés sur les risques IA ; et des ingénieurs ML ou data scientists ayant pivoté vers la gouvernance. La formation initiale est diverse (droit, informatique, ingénierie, sciences politiques). Des formations spécialisées EU AI Act émergent en 2025-2026 auprès de grandes écoles et organismes professionnels. C'est un rôle en pénurie critique en France.",
+
+  "Data Architect": "Construit sur 8 à 12 ans, le Data Architect est généralement issu d'une formation Bac+5 en informatique ou ingénierie. Les 4 à 6 premières années s'exercent en développement de bases de données, intégration de données ou architecture SI généraliste. La spécialisation data architecture survient progressivement par exposition à des projets d'envergure (entrepôts de données, migrations cloud, Data Mesh). Les certifications cloud (AWS Solutions Architect, GCP Professional Data Engineer) et la maîtrise des référentiels d'architecture (TOGAF, DAMA) sont valorisées. Le passage par le conseil en systèmes d'information est un parcours alternatif fréquent.",
+
+  "Data Engineer": "Rôle accessible dès la sortie d'études, avec un pic de productivité entre 3 et 7 ans d'expérience. La formation initiale la plus fréquente est Bac+5 en informatique, mathématiques appliquées ou école d'ingénieur. Les premières années (0-3 ans) sont consacrées à la maîtrise des fondamentaux : SQL, Python, gestion de bases de données, premiers pipelines ETL. L'évolution naturelle passe ensuite par les architectures cloud et le traitement de données à grande échelle. La reconversion depuis le développement logiciel backend est la voie alternative la plus courante — les compétences de software engineering se transfèrent bien.",
+
+  "Cloud Data Engineer": "Spécialisation du Data Engineer acquise généralement après 2 à 4 ans d'expérience en ingénierie data. Le parcours passe par les fondamentaux data engineering, puis une spécialisation progressive sur les services cloud managés (AWS, GCP ou Azure) en contexte professionnel. Les certifications cloud spécifiques data sont le signal différenciant principal sur le marché (AWS Certified Data Analytics, GCP Professional Data Engineer, Microsoft DP-203). Les profils issus du DevOps ou de l'infrastructure cloud qui se spécialisent sur la data constituent un parcours alternatif.",
+
+  "Database Administrator (DBA)": "Rôle accessible après 4 à 6 ans, souvent issu d'une formation Bac+3 à Bac+5 en informatique. Les premières années s'exercent en développement ou administration système, avec une spécialisation progressive sur les SGBD en contexte de production. L'acquisition de la maîtrise des environnements de haute disponibilité et de reprise d'activité vient avec l'expérience en production. Les certifications éditeurs (Oracle DBA, Microsoft SQL Server) restent valorisées dans les grandes DSI. Le rôle évolue progressivement vers le Cloud DBA, intégrant des compétences d'administration de bases de données managées cloud.",
+
+  "Data Modeler": "Rôle spécialisé construit sur 4 à 8 ans, souvent par une voie technique (Data Engineer ou développeur de bases de données) qui approfondit la discipline de la modélisation. La formation initiale en informatique ou mathématiques est habituelle. L'acquisition de la maîtrise des méthodologies (Merise, UML, Data Vault 2.0, Kimball) se fait généralement par la pratique de projets d'entrepôts de données. Une certification en modélisation des données (CDMP de DAMA) est valorisée. Dans les petites équipes, ce rôle est souvent exercé par le Data Architect.",
+
+  "DataOps Engineer": "Rôle émergent construit en 4 à 7 ans, issu de la convergence entre l'ingénierie data et le DevOps. Deux parcours principaux : des Data Engineers qui développent une expertise DevOps (CI/CD, IaC, observabilité) ; ou des ingénieurs DevOps/SRE qui se spécialisent sur les pipelines data. La formation initiale en informatique, systèmes ou ingénierie est la plus fréquente. Les certifications DevOps (Docker, Kubernetes CKA, GitHub Actions) combinées à une maîtrise des outils data (dbt, Airflow) constituent le profil recherché.",
+
+  "MLOps Engineer": "Construit en 4 à 8 ans, à l'intersection du data science et du software engineering. Les parcours types : des data scientists ou ML engineers qui formalisent leur expertise en déploiement de modèles ; ou des ingénieurs DevOps/backend qui se spécialisent sur les workloads ML. La formation initiale est généralement technique (informatique, mathématiques appliquées, ingénierie). La maîtrise de Kubernetes est souvent attendue pour les profils seniors. Les certifications MLflow, Kubeflow ou les certifications cloud ML (AWS MLS, GCP Professional ML Engineer) sont valorisées.",
+
+  "MLOps Specialist": "Profil expert senior du MLOps, généralement construit sur 8 à 12 ans. Le parcours passe d'abord par 4 à 6 ans en ingénierie ML ou MLOps Engineer, puis évolue vers des responsabilités d'architecture ou de conseil interne. La distinction avec le MLOps Engineer tient au niveau de séniorité, à la capacité à définir les standards à l'échelle de l'organisation, et souvent à une expérience dans plusieurs entreprises ou secteurs. Les profils issus du conseil en data engineering ou des équipes platform engineering des grandes entreprises tech constituent les profils types.",
+
+  "LLMOps Engineer": "Rôle très récent (émergent depuis 2023), sans parcours canonique établi. Les profils actuellement en poste viennent principalement de deux horizons : des MLOps Engineers qui ont pivoté vers les LLMs avec l'essor de ChatGPT (fin 2022) et se sont formés en autodidacte sur les architectures RAG, le fine-tuning et le monitoring LLM ; et des backend engineers ou full-stack developers passionnés par l'IA qui se sont spécialisés sur la mise en production de systèmes LLM. La formation initiale en informatique ou ingénierie est la plus fréquente. La communauté open source (Hugging Face, LangChain) et les bootcamps spécialisés GenAI constituent les principales voies de formation.",
+
+  "Analytics Engineer": "Rôle en forte croissance, accessible après 3 à 6 ans. Deux parcours types : des Data Analysts qui développent des compétences en SQL avancé et dbt pour prendre en charge la couche de transformation — parcours le plus fréquent ; ou des Data Engineers qui s'orientent vers l'analytique. La formation initiale est diverse : informatique, mathématiques, économie, école de commerce. La maîtrise de dbt (certification dbt Analytics Engineering) est devenue un signal fort sur le marché. Les certifications des plateformes data cloud (Snowflake, Databricks) complètent avantageusement le profil.",
+
+  "Data Analyst": "Porte d'entrée courante dans l'écosystème data, accessible dès la fin des études ou après une reconversion courte. La formation initiale la plus fréquente est Bac+3 à Bac+5 en statistiques, économie, mathématiques, informatique ou école de commerce. Les premières années (0-3 ans) sont consacrées à la maîtrise des outils (SQL, Excel, Power BI/Tableau) et à la compréhension d'un ou plusieurs domaines métier. La reconversion depuis des fonctions métier (contrôle de gestion, marketing, commercial) par formation intensive (bootcamp, master data) est très fréquente et constitue le premier parcours alternatif du secteur.",
+
+  "Business Analyst": "Rôle présent dans tous les secteurs, accessible après 2 à 5 ans. La formation initiale est diverse : école de commerce, ingénieur, droit, sciences politiques. Les premières années s'exercent souvent en MOA (maîtrise d'ouvrage) ou en conseil en organisation. La spécialisation data se développe progressivement avec l'exposition à des projets SI ou analytiques. Les reconversions depuis des fonctions métier (comptabilité, contrôle de gestion, chef de projet) constituent un parcours alternatif très répandu. La certification CBAP (Certified Business Analysis Professional, IIBA) est la référence internationale.",
+
+  "Data Translator": "Rôle rare sans formation dédiée, construit sur 5 à 10 ans d'expérience. Profil hybride par essence, il se constitue généralement soit par une voie technique (data analyst ou data scientist) qui développe un fort sens business et des compétences de communication exécutive ; soit par une voie métier ou conseil (consultant stratégie, directeur d'activité) qui développe une compréhension suffisante des capacités et limites de la data. Ce rôle est souvent créé sur mesure dans les grandes organisations, rarement recruté directement depuis l'extérieur.",
+
+  "BI Developer": "Accessible après 2 à 6 ans, souvent issu d'une formation en informatique, mathématiques ou école de commerce. Les premières années s'exercent en développement de rapports et tableaux de bord, avec un approfondissement progressif de la modélisation sémantique (DAX pour Power BI) et des performances. La maîtrise d'un outil BI dominant (Power BI, Tableau) est le prérequis central. Les certifications éditeurs sont valorisées (Microsoft PL-300 pour Power BI, Tableau Desktop Specialist). La reconversion depuis des fonctions de contrôle de gestion ou de comptabilité est fréquente.",
+
+  "Data Scientist": "Construit sur 3 à 8 ans, avec une formation initiale généralement forte en mathématiques, statistiques, physique, informatique ou ingénierie (Bac+5 ou Bac+8). Les premières années (0-3 ans) sont consacrées à la maîtrise des fondamentaux ML (bibliothèques Python, statistiques appliquées, feature engineering) sur des projets réels. L'évolution passe par la spécialisation dans des domaines (NLP, computer vision, séries temporelles) ou des secteurs (finance, santé, e-commerce). Les profils issus de la recherche académique (thèse de doctorat) constituent un parcours alternatif valorisé dans les équipes avancées.",
+
+  "ML Engineer": "Construit sur 4 à 8 ans, à l'intersection du data science et du software engineering. La formation initiale est généralement forte en informatique ou ingénierie (Bac+5). Les premières années alternent entre développement logiciel et initiation au ML. La différenciation avec le Data Scientist se construit par un investissement délibéré dans les compétences software engineering (tests, architecture, performance) appliquées au ML. Les profils ingénieurs backend ou full-stack qui se spécialisent ML constituent la voie alternative principale.",
+
+  "AI Engineer": "Rôle en très forte croissance (n°1 LinkedIn France 2026), construit en 3 à 7 ans. La formation initiale en informatique, ingénierie ou mathématiques appliquées constitue les bases. Les premières années s'exercent en développement logiciel, data science ou ML engineering. La spécialisation AI Engineer s'est massifiée depuis fin 2022 avec l'essor des LLMs accessibles via API. Des ingénieurs de tous horizons (web, backend, mobile) se sont reconvertis rapidement via les ressources communautaires (Hugging Face, LangChain docs, fast.ai). C'est le rôle le plus accessible aux reconversions rapides de l'écosystème data/IA en 2026.",
+
+  "GenAI / Prompt Engineer": "Rôle très récent (apparu massivement en 2023), construit en 1 à 4 ans d'expérience. Il n'existe pas encore de formation initiale dédiée — les profils viennent d'horizons très variés : ingénieurs, rédacteurs, linguistes, product managers, consultants. Les compétences s'acquièrent principalement en autodidacte via la pratique et les ressources communautaires. Ce rôle tend à évoluer vers l'AI Engineer pour les profils qui développent des compétences techniques, ou vers le Product Manager IA pour ceux qui privilégient la dimension stratégique. La principale voie de différenciation est la constitution d'un portfolio de projets concrets démontrant la maîtrise des techniques d'évaluation et d'optimisation."
+
+};
+
+/* ============================================================
+   FONCTIONS DE REMPLACEMENT DES APPELS API
+   ============================================================ */
+
+function showSkillTooltip(skill, branch) {
+  const overlay = document.getElementById('skillOverlay');
+  const title   = document.getElementById('skillTooltipTitle');
+  const body    = document.getElementById('skillTooltipBody');
+  const footer  = document.getElementById('skillTooltipFooter');
+
+  title.textContent = skill;
+  footer.textContent = 'Définition vérifiée · Sources : DAMA-DMBOK v2, référentiels officiels, mars 2026';
+  overlay.classList.add('visible');
+
+  // Recherche exacte d'abord
+  let def = SKILL_DEFINITIONS[skill];
+
+  // Recherche partielle si pas trouvé (pour les compétences avec parenthèses)
+  if (!def) {
+    const key = Object.keys(SKILL_DEFINITIONS).find(k =>
+      k.startsWith(skill.split('(')[0].trim()) || skill.startsWith(k.split('(')[0].trim())
+    );
+    if (key) def = SKILL_DEFINITIONS[key];
+  }
+
+  if (def) {
+    body.innerHTML = `<div class="skill-tooltip-text">${def}</div>`;
+  } else {
+    body.innerHTML = `<div class="skill-tooltip-text" style="color:var(--color-text-alt);font-style:italic">
+      Définition non disponible pour cette compétence dans la version statique.
+    </div>`;
+  }
+}
+
+function showCareerPath(jobTitle, branch, level) {
   const overlay = document.getElementById('careerOverlay');
   const title   = document.getElementById('careerModalTitle');
   const body    = document.getElementById('careerModalBody');
 
   title.textContent = jobTitle;
-  body.innerHTML = `<div class="career-loading"><div class="career-spinner"></div><span>Chargement du parcours…</span></div>`;
   overlay.classList.add('visible');
 
-  const cacheKey = jobTitle;
-  if (careerCache[cacheKey]) {
-    renderCareerText(body, careerCache[cacheKey]);
-    return;
+  const path = CAREER_PATHS[jobTitle];
+
+  if (path) {
+    const paras = path.split(/\n\n+/).filter(Boolean);
+    body.innerHTML = `<div class="career-modal-text">${paras.map(p => `<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}</div>`;
+  } else {
+    body.innerHTML = `<div class="career-modal-text" style="color:var(--color-text-alt);font-style:italic">
+      Parcours non disponible pour ce métier dans la version statique.
+    </div>`;
   }
+}
 
-  try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: `Tu es un expert RH et carrières dans les métiers de la Data et de l'IA en France, en 2026.
-Quand on te demande le parcours d'accès à un métier data, tu réponds de façon structurée, factuelle et vérifiable.
-Règles strictes :
-- Tu décris les étapes de carrière typiques SANS citer de noms précis de postes ou de titres de métiers (pas de "Data Analyst", "ML Engineer", etc.) — décris les fonctions et responsabilités à la place
-- Tu mentionnes les formations initiales les plus fréquentes (types de diplômes, domaines d'études) sans nommer d'écoles précises
-- Tu indiques les durées typiques à chaque étape
-- Tu mentionnes 2-3 chemins alternatifs possibles (reconversion, parcours atypiques)
-- 4-6 phrases maximum, ton factuel
-- Réponds uniquement en français, sans markdown, sans bullet points, en prose fluide`,
-        messages: [{
-          role: "user",
-          content: `Décris le parcours d'accès typique au métier suivant en France en 2026, en respectant strictement les règles de format : "${jobTitle}" (branche : ${branch}, niveau : ${level})`
-        }]
-      })
-    });
-
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    const text = data.content?.map(b => b.text || '').join('') || '';
-    if (!text) throw new Error('Réponse vide');
-
-    careerCache[cacheKey] = text;
-    renderCareerText(body, text);
-
-  } catch (err) {
-    body.innerHTML = `<p style="font-size:13px;color:var(--color-not-acquired);font-style:italic">
-      Impossible de charger le parcours. Vérifiez votre connexion.<br>
-      <small style="opacity:0.7">${err.message}</small>
-    </p>`;
-  }
+function renderSkillText(container, text) {
+  container.innerHTML = `<div class="skill-tooltip-text">${text.replace(/\n\n/g, '</p><p style="margin-top:10px">').replace(/\n/g, '<br>')}</div>`;
 }
 
 function renderCareerText(container, text) {
@@ -1512,12 +1943,17 @@ function renderCareerText(container, text) {
   container.innerHTML = `<div class="career-modal-text">${paras.map(p => `<p>${p.replace(/\n/g,'<br>')}</p>`).join('')}</div>`;
 }
 
-function closeCareerModal(e) {
-  if (e.target === document.getElementById('careerOverlay')) {
-    document.getElementById('careerOverlay').classList.remove('visible');
-  }
+function closeSkillTooltip(e) {
+  if (e.target === document.getElementById('skillOverlay'))
+    document.getElementById('skillOverlay').classList.remove('visible');
 }
-
+function closeSkillTooltipDirect() {
+  document.getElementById('skillOverlay').classList.remove('visible');
+}
+function closeCareerModal(e) {
+  if (e.target === document.getElementById('careerOverlay'))
+    document.getElementById('careerOverlay').classList.remove('visible');
+}
 function closeCareerModalDirect() {
   document.getElementById('careerOverlay').classList.remove('visible');
 }
@@ -1529,80 +1965,6 @@ document.addEventListener('keydown', e => {
     document.getElementById('sourcesOverlay').classList.remove('visible');
   }
 });
-const skillCache = {};
-
-async function showSkillTooltip(skill, branch) {
-  const overlay  = document.getElementById('skillOverlay');
-  const title    = document.getElementById('skillTooltipTitle');
-  const body     = document.getElementById('skillTooltipBody');
-  const footer   = document.getElementById('skillTooltipFooter');
-
-  title.textContent = skill;
-  footer.textContent = 'Définition générée par IA · Contexte : métiers de la Data 2026';
-
-  // Show overlay immediately with spinner
-  body.innerHTML = `<div class="skill-tooltip-loading"><div class="skill-spinner"></div><span>Chargement de la définition…</span></div>`;
-  overlay.classList.add('visible');
-
-  // Cache hit
-  if (skillCache[skill]) {
-    renderSkillText(body, skillCache[skill]);
-    return;
-  }
-
-  try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: `Tu es un expert des métiers de la Data et de l'IA, pédagogue et précis. 
-Quand on te demande la définition d'une compétence dans le contexte des métiers de la data, tu réponds en 3-5 phrases claires et concrètes :
-1. Ce qu'est la compétence (définition précise)
-2. Pourquoi elle est utile dans ce contexte métier
-3. Un exemple concret d'application si pertinent
-Tu réponds uniquement en français, sans introduction ni mise en forme markdown. Sois factuel, précis et accessible.`,
-        messages: [{
-          role: "user",
-          content: `Donne-moi la définition détaillée de cette compétence dans le contexte des métiers de la Data et de l'IA en 2026 (branche : ${branch}) : "${skill}"`
-        }]
-      })
-    });
-
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    const text = data.content?.map(b => b.text || '').join('') || '';
-
-    if (!text) throw new Error('Réponse vide');
-
-    skillCache[skill] = text;
-    renderSkillText(body, text);
-
-  } catch (err) {
-    body.innerHTML = `<p class="skill-tooltip-error">
-      Impossible de charger la définition. Vérifiez votre connexion et réessayez.<br>
-      <small style="opacity:0.7">${err.message}</small>
-    </p>`;
-    footer.textContent = 'Erreur de chargement';
-  }
-}
-
-function renderSkillText(container, text) {
-  container.innerHTML = `<div class="skill-tooltip-text">${text.replace(/\n\n/g, '</p><p style="margin-top:10px">').replace(/\n/g, '<br>')}</div>`;
-}
-
-function closeSkillTooltip(e) {
-  // Only close if clicking the overlay background, not the tooltip itself
-  if (e.target === document.getElementById('skillOverlay')) {
-    document.getElementById('skillOverlay').classList.remove('visible');
-  }
-}
-
-function closeSkillTooltipDirect() {
-  document.getElementById('skillOverlay').classList.remove('visible');
-}
-
 let currentActive = null;
 
 function showPanel(id) {
